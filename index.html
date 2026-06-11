@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StellarStays | Premium Villas, Farmstays & Homestays in India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --brand-navy: #0f1f3d;
+            --brand-amber: #f59e0b;
+            --brand-coral: #ef4444;
+            --brand-cream: #fdf8f0;
+            --brand-teal: #0d9488;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: #f8f7f4; }
+        h1, h2, h3, .display { font-family: 'Playfair Display', serif; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* FAQ Accordion */
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0,1,0,1); }
+        .faq-item.active .faq-answer { max-height: 500px; transition: max-height 0.5s ease-in-out; }
+        .faq-item.active .faq-icon { transform: rotate(180deg); }
+
+        /* Hero background */
+        .hero-bg {
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Card hover */
+        .property-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .property-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(15,31,61,0.12); }
+        .property-card:hover .card-img { transform: scale(1.06); }
+        .card-img { transition: transform 0.5s ease; }
+
+        /* Location pill active */
+        .loc-btn-active { background: var(--brand-navy); color: #fff; }
+        .loc-btn-inactive { background: #fff; color: #4b5563; border: 1px solid #e5e7eb; }
+        .loc-btn-inactive:hover { background: #f3f4f6; }
+
+        /* Hot badge pulse */
+        @keyframes pulse-badge { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
+        .hot-badge { animation: pulse-badge 2s infinite; }
+
+        /* Search bar focus glow */
+        .search-wrap:focus-within { box-shadow: 0 0 0 3px rgba(245,158,11,0.25), 0 20px 60px rgba(15,31,61,0.12); }
+        .search-wrap { transition: box-shadow 0.3s ease; box-shadow: 0 8px 40px rgba(15,31,61,0.10); }
+
+        /* Floating mascot */
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .mascot { animation: float 4s ease-in-out infinite; }
+
+        /* Trust badges */
+        .trust-pill { background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.6); }
+
+        /* Stats counter */
+        .stat-card { background: #fff; border: 1px solid #f0ede6; }
+
+        /* Navbar scroll */
+        #mainNav { transition: background 0.3s, box-shadow 0.3s, border-color 0.3s; }
+        #mainNav.scrolled { background: #fff !important; box-shadow: 0 2px 12px rgba(15,31,61,0.08); border-bottom-color: #f3f4f6 !important; }
+</style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- ===================== NAVIGATION ===================== -->
+    <nav id="mainNav" class="bg-white fixed top-0 left-0 right-0 z-50 px-4 md:px-10 py-4 flex justify-between items-center">
+        <div class="text-2xl font-black tracking-wider text-[--brand-navy] cursor-pointer flex items-center gap-1" onclick="window.location.href='index.html'" style="font-family:'Playfair Display',serif;">
+            STELLAR<span class="text-amber-500">STAYS</span>
+        </div>
+        <div class="hidden md:flex items-center space-x-10 font-semibold text-base text-gray-600 absolute left-1/2 -translate-x-1/2">
+            <a href="index.html" class="hover:text-[--brand-navy] transition">Home</a>
+            <a href="#destinations" class="hover:text-[--brand-navy] transition">Destinations</a>
+            <a href="about-us.html" class="hover:text-[--brand-navy] transition">About Us</a>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="https://wa.me/919876543210" target="_blank" class="hidden md:flex items-center gap-1.5 text-emerald-600 font-semibold text-sm hover:text-emerald-700 transition">
+                <i class="fa-brands fa-whatsapp text-lg"></i> Chat
+            </a>
+        </div>
+    </nav>
+
+    <!-- ===================== HERO ===================== -->
+    <header class="relative min-h-[88vh] flex items-center justify-center pt-[68px] pb-10 px-4 md:px-10 overflow-hidden">
+        <!-- Background villa image -->
+        <img 
+            src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1600&h=900&fit=crop&crop=center" 
+            alt="Luxury villa" 
+            class="absolute inset-0 w-full h-full object-cover"
+        >
+        <!-- Dark gradient overlay so text is readable -->
+        <div class="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/60"></div>
+
+        <!-- Content -->
+        <div class="relative z-10 max-w-5xl mx-auto text-center space-y-6 w-full">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-lg">
+                Book Your Happy Vacation Stay 🏡
+            </h1>
+            <p class="text-white/80 text-sm md:text-base font-medium">Handpicked villas, farmstays &amp; homestays across India</p>
+
+            <!-- SEARCH BAR -->
+            <div class="search-wrap bg-white rounded-full border border-gray-200 p-1.5 flex items-center max-w-3xl mx-auto shadow-2xl">
+                <div class="flex-1 flex items-center divide-x divide-gray-200">
+                    <div class="flex-[2] px-5 py-2">
+                        <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Where</div>
+                        <input type="text" id="searchLocation" placeholder="Search Destination or Property" class="w-full focus:outline-none text-sm font-semibold text-[--brand-navy] placeholder-gray-400 bg-transparent">
+                    </div>
+                    <div class="flex-1 px-5 py-2 cursor-pointer" id="triggerCheckIn">
+                        <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Start Date</div>
+                        <input type="text" id="startDateInput" placeholder="Add date" readonly class="w-full focus:outline-none text-sm font-semibold text-[--brand-navy] placeholder-gray-400 bg-transparent cursor-pointer">
+                    </div>
+                    <div class="flex-1 px-5 py-2 cursor-pointer" id="triggerCheckOut">
+                        <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">End Date</div>
+                        <input type="text" id="endDateInput" placeholder="Add date" readonly class="w-full focus:outline-none text-sm font-semibold text-[--brand-navy] placeholder-gray-400 bg-transparent cursor-pointer">
+                    </div>
+                    <div class="flex-1 px-5 py-2">
+                        <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Guests</div>
+                        <select id="searchGuests" class="w-full bg-transparent focus:outline-none text-sm font-semibold text-[--brand-navy] cursor-pointer">
+                            <option value="1">1 Guest</option>
+                            <option value="2">2 Guests</option>
+                            <option value="4">4 Guests</option>
+                            <option value="6">6 Guests</option>
+                            <option value="8">8+ Guests</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="handleSearch()" class="bg-red-500 hover:bg-red-600 text-white w-12 h-12 rounded-full flex items-center justify-center transition shadow-md shrink-0 ml-1">
+                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Trust badges -->
+            <div class="flex items-center justify-center gap-3 flex-wrap">
+                <span class="bg-white/15 backdrop-blur-sm text-white text-xs font-semibold px-4 py-1.5 rounded-full border border-white/25">✨ 500+ Properties</span>
+                <span class="bg-white/15 backdrop-blur-sm text-white text-xs font-semibold px-4 py-1.5 rounded-full border border-white/25">🏡 Pan India</span>
+                <span class="bg-white/15 backdrop-blur-sm text-white text-xs font-semibold px-4 py-1.5 rounded-full border border-white/25">⚡ Direct Host Booking</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================== LOCATION FILTER ===================== -->
+    <section class="bg-white border-b border-gray-100 px-4 md:px-10 py-4" id="destinations">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
+                <!-- Location pills — populated dynamically by app.js from live DB data -->
+                <div id="locationPills" class="flex items-center gap-2 flex-1 overflow-x-auto no-scrollbar">
+                    <!-- Pills render here once properties load -->
+                    <span class="text-xs text-gray-400 font-medium animate-pulse">Loading destinations…</span>
+                </div>
+                <!-- Right side badges -->
+                <div class="flex items-center gap-2 shrink-0 ml-auto pl-4 border-l border-gray-100">
+                    <span class="flex items-center gap-1.5 text-xs font-bold text-[--brand-navy] bg-white px-4 py-2.5 rounded-full border border-gray-200 shadow-sm whitespace-nowrap">
+                        <i class="fa-solid fa-bolt text-amber-400"></i> Direct Booking
+                    </span>
+                    <span class="flex items-center gap-1.5 text-xs font-bold text-red-500 bg-white px-4 py-2.5 rounded-full border border-gray-200 shadow-sm whitespace-nowrap">
+                        <i class="fa-solid fa-fire"></i> Hot Price
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== PROPERTY GRID ===================== -->
+    <main class="max-w-7xl mx-auto px-4 md:px-10 py-8 w-full flex-grow">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-xl md:text-2xl font-black text-[--brand-navy]" id="gridTitle">Featured Properties</h2>
+                <span class="text-xs text-gray-400 font-semibold" id="propertyCount">Gathering collection...</span>
+            </div>
+            <div class="hidden md:flex items-center gap-2 text-xs font-bold text-gray-500 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
+                <i class="fa-solid fa-sliders text-amber-400"></i> Sort & Filter
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="propertyGrid">
+            <div class="text-gray-400 py-16 col-span-full text-center font-medium animate-pulse">Assembling your dream spaces...</div>
+        </div>
+    </main>
+
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section class="bg-[--brand-navy] text-white py-20 px-4 md:px-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-14">
+                <span class="text-amber-400 text-xs font-black uppercase tracking-widest">Zero Commission • Direct Booking</span>
+                <h2 class="text-3xl md:text-4xl font-black mt-3 text-white">How StellarStays Works</h2>
+                <p class="text-gray-400 text-sm md:text-base mt-3 max-w-2xl mx-auto leading-relaxed">
+                    We connect travelers directly with verified property owners — no commission cuts, no platform markups.
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center space-y-4 group">
+                    <div class="w-16 h-16 bg-amber-500/20 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-amber-500/30 transition">
+                        <i class="fa-solid fa-magnifying-glass text-amber-400 text-2xl"></i>
+                    </div>
+                    <div class="text-amber-400 text-xs font-black uppercase tracking-widest">Step 01</div>
+                    <h3 class="text-lg font-bold text-white">Search & Discover</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">Browse verified villas and homestays by location, dates, and group size.</p>
+                </div>
+                <div class="text-center space-y-4 group">
+                    <div class="w-16 h-16 bg-teal-500/20 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-teal-500/30 transition">
+                        <i class="fa-solid fa-calendar-check text-teal-400 text-2xl"></i>
+                    </div>
+                    <div class="text-teal-400 text-xs font-black uppercase tracking-widest">Step 02</div>
+                    <h3 class="text-lg font-bold text-white">Book Directly</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">Choose your dates, customize your stay with add-ons, and confirm instantly.</p>
+                </div>
+                <div class="text-center space-y-4 group">
+                    <div class="w-16 h-16 bg-rose-500/20 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-rose-500/30 transition">
+                        <i class="fa-solid fa-star text-rose-400 text-2xl"></i>
+                    </div>
+                    <div class="text-rose-400 text-xs font-black uppercase tracking-widest">Step 03</div>
+                    <h3 class="text-lg font-bold text-white">Experience & Review</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">Arrive to a curated, fully-staffed property and leave a genuine review.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== OUR STORY PILLARS ===================== -->
+    <section class="bg-[--brand-cream] py-20 px-4 md:px-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-14">
+                <span class="text-amber-500 text-xs font-black uppercase tracking-widest">Our Mission</span>
+                <h2 class="text-3xl md:text-4xl font-black text-[--brand-navy] mt-3">Why Choose StellarStays?</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-2xl p-6 space-y-3 border border-amber-100 shadow-sm hover:shadow-md transition">
+                    <div class="text-amber-500 text-3xl"><i class="fa-solid fa-lightbulb"></i></div>
+                    <h4 class="font-bold text-[--brand-navy]">Custom Solutions</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed font-medium">No one-size-fits-all. Choose service levels that suit your lifestyle and trip style perfectly.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 space-y-3 border border-teal-100 shadow-sm hover:shadow-md transition">
+                    <div class="text-teal-600 text-3xl"><i class="fa-solid fa-gear"></i></div>
+                    <h4 class="font-bold text-[--brand-navy]">Tech-Powered Ease</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed font-medium">Advanced tools handle the hard work so you can focus on creating memorable experiences.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 space-y-3 border border-rose-100 shadow-sm hover:shadow-md transition">
+                    <div class="text-rose-500 text-3xl"><i class="fa-solid fa-face-smile"></i></div>
+                    <h4 class="font-bold text-[--brand-navy]">Guest First Always</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed font-medium">We prioritize happiness at every step. Your operational success is our reward.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 space-y-3 border border-indigo-100 shadow-sm hover:shadow-md transition">
+                    <div class="text-indigo-600 text-3xl"><i class="fa-solid fa-users"></i></div>
+                    <h4 class="font-bold text-[--brand-navy]">Supportive Community</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed font-medium">Connect with passionate owners who share your values and journey.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FAQ ===================== -->
+    <section class="bg-white py-20 px-4 md:px-8">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-black text-[--brand-navy]">Frequently Asked Questions</h2>
+            </div>
+            <div class="space-y-3" id="homepageFaqContainer">
+                <div class="faq-item bg-[--brand-cream] border border-amber-100 rounded-2xl overflow-hidden" onclick="toggleHomepageFaq(this)">
+                    <button class="w-full p-5 text-left flex justify-between items-center gap-4 text-sm font-bold text-[--brand-navy] focus:outline-none">
+                        <span>Is there any booking fee or commission?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-gray-400 faq-icon transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p class="px-5 pb-5 pt-1 text-sm text-gray-600 leading-relaxed">No. StellarStays charges zero commission to guests. You pay only the property rate, add-ons you select, and applicable GST.</p>
+                    </div>
+                </div>
+                <div class="faq-item bg-[--brand-cream] border border-amber-100 rounded-2xl overflow-hidden" onclick="toggleHomepageFaq(this)">
+                    <button class="w-full p-5 text-left flex justify-between items-center gap-4 text-sm font-bold text-[--brand-navy] focus:outline-none">
+                        <span>How do I know the property is verified?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-gray-400 faq-icon transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p class="px-5 pb-5 pt-1 text-sm text-gray-600 leading-relaxed">Every property on StellarStays is physically inspected and host-verified before listing. Look for the <strong>Verified Luxury Partner</strong> badge on any listing.</p>
+                    </div>
+                </div>
+                <div class="faq-item bg-[--brand-cream] border border-amber-100 rounded-2xl overflow-hidden" onclick="toggleHomepageFaq(this)">
+                    <button class="w-full p-5 text-left flex justify-between items-center gap-4 text-sm font-bold text-[--brand-navy] focus:outline-none">
+                        <span>What is the cancellation policy?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-gray-400 faq-icon transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p class="px-5 pb-5 pt-1 text-sm text-gray-600 leading-relaxed">Cancellations made 7+ days before check-in receive a full refund. Within 7 days, 50% is refunded. No-shows are non-refundable. Specific property policies may vary.</p>
+                    </div>
+                </div>
+                <div class="faq-item bg-[--brand-cream] border border-amber-100 rounded-2xl overflow-hidden" onclick="toggleHomepageFaq(this)">
+                    <button class="w-full p-5 text-left flex justify-between items-center gap-4 text-sm font-bold text-[--brand-navy] focus:outline-none">
+                        <span>Can I list my property on StellarStays?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-gray-400 faq-icon transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p class="px-5 pb-5 pt-1 text-sm text-gray-600 leading-relaxed">Absolutely! Click "List Your Property" in the nav or WhatsApp us. Our team will onboard you, professionally photograph your space, and have it live within 48 hours.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="bg-[--brand-navy] text-gray-400 pt-14 pb-8 px-4 md:px-8 relative mt-auto">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 pb-10 border-b border-white/10">
+            <div class="md:col-span-4 space-y-4">
+                <div class="text-2xl font-black tracking-wider text-white" style="font-family:'Playfair Display',serif;">
+                    STELLAR<span class="text-amber-400">STAYS</span>
+                </div>
+                <p class="text-xs text-gray-500 font-medium leading-relaxed max-w-xs">
+                    Turn your property into profits with StellarStays. Exceptional property management and premium vacation rentals across India.
+                </p>
+                <div class="flex gap-3 text-lg text-gray-500">
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-square-facebook"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="md:col-span-5 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs font-semibold text-gray-500">
+                <div class="space-y-3">
+                    <h5 class="text-gray-200 font-bold text-sm tracking-wide">Explore</h5>
+                    <ul class="space-y-2.5">
+                        <li><a href="about-us.html" class="hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Travel Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition">Hosting Templates</a></li>
+                        <li><a href="#" class="hover:text-white transition">Terms of Use</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-3">
+                    <h5 class="text-gray-200 font-bold text-sm tracking-wide">Support</h5>
+                    <ul class="space-y-2.5">
+                        <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Host Knowledge Hub</a></li>
+                        <li><a href="#" class="hover:text-white transition">Ground Rules for Hosts</a></li>
+                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-3">
+                    <h5 class="text-gray-200 font-bold text-sm tracking-wide">Legal</h5>
+                    <ul class="space-y-2.5">
+                        <li><a href="#" class="hover:text-white transition">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition">State Regulation</a></li>
+                        <li><a href="#" class="hover:text-white transition">Cancellation & Refund</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="md:col-span-3 space-y-4">
+                <h5 class="text-gray-200 font-bold text-sm tracking-wide">List Your Property</h5>
+                <p class="text-xs text-gray-500 leading-relaxed">Join 50+ property owners earning more with zero commission.</p>
+                <a href="https://wa.me/919876543210" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-600 transition shadow-md">
+                    <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp Us
+                </a>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-[11px] text-gray-600">
+            <span>Copyright © 2026 StellarStays. All rights reserved.</span>
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-code text-amber-400"></i> Designed & Developed by WebNova</span>
+        </div>
+
+        <!-- WhatsApp FAB -->
+        <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-50 bg-emerald-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-2xl hover:bg-emerald-600 hover:scale-110 transition duration-300 group">
+            <i class="fa-brands fa-whatsapp"></i>
+            <span class="absolute right-16 bg-white text-gray-800 text-xs font-bold px-3 py-1.5 rounded-xl border border-gray-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">Chat with Us</span>
+        </a>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Range date picker for hero search
+            flatpickr("#startDateInput", {
+                mode: "range",
+                minDate: "today",
+                dateFormat: "Y-m-d",
+                onChange: function(selectedDates) {
+                    if (selectedDates.length >= 1) {
+                        document.getElementById("startDateInput").value = selectedDates[0].toISOString().split('T')[0];
+                    }
+                    if (selectedDates.length === 2) {
+                        document.getElementById("endDateInput").value = selectedDates[1].toISOString().split('T')[0];
+                    } else {
+                        document.getElementById("endDateInput").value = "";
+                    }
+                }
+            });
+            document.getElementById("triggerCheckOut").addEventListener("click", () => {
+                document.getElementById("startDateInput")._flatpickr.open();
+            });
+        });
+
+        function toggleHomepageFaq(element) {
+            const isActive = element.classList.contains("active");
+            document.querySelectorAll("#homepageFaqContainer .faq-item").forEach(item => item.classList.remove("active"));
+            if (!isActive) element.classList.add("active");
+        }
+
+        // Navbar: no shadow at top, shadow when scrolled
+        (function() {
+            const nav = document.getElementById('mainNav');
+            function updateNav() {
+                if (window.scrollY > 10) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+            }
+            window.addEventListener('scroll', updateNav);
+            updateNav();
+        })();
+    </script>
+    
+
+    <script>
+    // ============================================================
+    // STELLARSTAYS — FULL APP LOGIC (inlined, no external dep)
+    // ============================================================
+    let propertiesInventory = [];
+
+    // ── API base: works for Live Server (:5500) AND direct (:5000)
+    function getApiBase() {
+        const { hostname, port } = window.location;
+        return (port && port !== '5000')
+            ? `http://${hostname}:5000/api`
+            : '/api';
+    }
+
+    // ── Navigate to booking page
+    function goToBooking(id) {
+        const checkIn  = document.getElementById('startDateInput').value  || '';
+        const checkOut = document.getElementById('endDateInput').value    || '';
+        const guests   = document.getElementById('searchGuests').value    || '1';
+        window.location.href = `booking.html?id=${id}&checkIn=${checkIn}&checkOut=${checkOut}&adults=${guests}`;
+    }
+
+    // ── Render property cards
+    function renderProperties(properties) {
+        const grid  = document.getElementById('propertyGrid');
+        const count = document.getElementById('propertyCount');
+        grid.innerHTML = '';
+        count.innerText = `${properties.length} ${properties.length === 1 ? 'space' : 'spaces'} available`;
+
+        if (properties.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full text-center py-16">
+                    <i class="fa-regular fa-folder-open text-4xl text-gray-300 mb-3 block"></i>
+                    <p class="text-gray-500 font-semibold text-sm">No properties found for this selection.</p>
+                    <button onclick="filterByLocation('all')" class="mt-4 text-xs font-bold text-indigo-700 underline">View all stays →</button>
+                </div>`;
+            return;
+        }
+
+        properties.forEach(item => {
+            const badges = (item.amenities || []).slice(0, 2).map(a =>
+                `<span class="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-md font-medium">${a}</span>`
+            ).join('');
+            const hotBadge = item.hot
+                ? `<span class="absolute top-3 left-3 hot-badge bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow z-10">🔥 Hot Price</span>`
+                : '';
+            const price  = item.pricePerNight || 0;
+            const rating = item.rating || 4.8;
+            grid.innerHTML += `
+                <div onclick="goToBooking('${item._id}')" class="property-card bg-white rounded-2xl overflow-hidden border border-gray-100 flex flex-col cursor-pointer group">
+                    <div class="relative overflow-hidden aspect-[4/3] bg-gray-200">
+                        <img src="${item.image || ''}" alt="${item.name || 'Property'}" class="card-img w-full h-full object-cover"
+                             onerror="this.src='https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80'">
+                        ${hotBadge}
+                        <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 font-bold px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 shadow-sm z-10">
+                            <i class="fa-solid fa-star text-amber-500"></i> ${rating}
+                        </span>
+                        <span class="absolute bottom-3 left-3 bg-[#0f1f3d]/90 text-white text-xs font-semibold px-3 py-1 rounded-md shadow z-10 max-w-[55%] truncate">
+                            📍 ${item.location || 'India'}
+                        </span>
+                        <span class="absolute bottom-3 right-3 bg-teal-500/90 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow z-10 flex items-center gap-1 whitespace-nowrap">
+                            <i class="fa-solid fa-bolt"></i> Direct
+                        </span>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-3 text-xs text-gray-400 font-semibold uppercase tracking-wider mb-2">
+                                <span><i class="fa-solid fa-users"></i> ${item.guests || 0} Guests</span>
+                                <span>•</span>
+                                <span><i class="fa-solid fa-bed"></i> ${item.bedrooms || 0} BHK</span>
+                            </div>
+                            <h4 class="text-base font-bold text-gray-900 group-hover:text-indigo-900 transition line-clamp-1 mb-3">${item.name || 'Boutique Stay'}</h4>
+                            <div class="flex gap-1.5 flex-wrap mb-4">${badges}</div>
+                        </div>
+                        <div class="border-t border-gray-100 pt-4 flex justify-between items-center">
+                            <div>
+                                <span class="text-xl font-extrabold text-[#0f1f3d]">₹${price.toLocaleString('en-IN')}</span>
+                                <span class="text-xs text-gray-400 font-medium"> / night</span>
+                            </div>
+                            <button class="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-amber-500 hover:text-white hover:border-amber-500 transition shadow-sm">
+                                View Details →
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        });
+    }
+
+    // ── Build location filter pills from live data
+    function buildLocationPills(properties) {
+        const container = document.getElementById('locationPills');
+        if (!container) return;
+        const locations = [...new Set(properties.map(p => p.location).filter(Boolean))].sort();
+        const cls = 'location-btn shrink-0 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition whitespace-nowrap';
+        container.innerHTML =
+            `<button onclick="filterByLocation('all')" class="${cls} loc-btn-active">🌍 All</button>` +
+            locations.map(l =>
+                `<button onclick="filterByLocation('${l}')" class="${cls} loc-btn-inactive">${l}</button>`
+            ).join('');
+    }
+
+    // ── Location filter
+    function filterByLocation(location) {
+        document.querySelectorAll('.location-btn').forEach(btn => {
+            const t = btn.innerText.replace(/[^a-zA-Z\s]/g, '').trim().toLowerCase();
+            const active = location === 'all' ? t.includes('all') : t === location.toLowerCase();
+            btn.className = (active ? 'location-btn loc-btn-active' : 'location-btn loc-btn-inactive') +
+                ' shrink-0 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition whitespace-nowrap';
+        });
+        document.getElementById('gridTitle').innerText = location === 'all'
+            ? 'Featured Properties' : `Premium Stays in ${location}`;
+        renderProperties(location === 'all'
+            ? propertiesInventory
+            : propertiesInventory.filter(p => p.location && p.location.toLowerCase() === location.toLowerCase())
+        );
+    }
+
+    // ── Search
+    function handleSearch() {
+        const text   = document.getElementById('searchLocation').value.toLowerCase().trim();
+        const guests = parseInt(document.getElementById('searchGuests').value) || 1;
+        const filtered = propertiesInventory.filter(p =>
+            (!text || (p.location||'').toLowerCase().includes(text) || (p.name||'').toLowerCase().includes(text)) &&
+            (p.guests || 0) >= guests
+        );
+        document.getElementById('gridTitle').innerText = text ? `Results for "${text}"` : 'Search Results';
+        renderProperties(filtered);
+    }
+
+    // ── Load from API
+    async function loadProperties() {
+        const API = getApiBase();
+        const grid  = document.getElementById('propertyGrid');
+        const count = document.getElementById('propertyCount');
+
+        console.log('[StellarStays] API base:', API);
+        grid.innerHTML  = `<div class="col-span-full text-center py-16 text-gray-400 font-medium animate-pulse">Assembling your dream spaces…</div>`;
+        count.innerText = 'Loading…';
+
+        try {
+            const res = await fetch(`${API}/properties`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            const all = await res.json();
+            console.log('[StellarStays] Total from DB:', all.length);
+
+            propertiesInventory = all.filter(p => !p.status || p.status === 'Active');
+            console.log('[StellarStays] Active:', propertiesInventory.length);
+
+            buildLocationPills(propertiesInventory);
+            renderProperties(propertiesInventory);
+        } catch (err) {
+            console.error('[StellarStays] Fetch error:', err);
+            grid.innerHTML = `
+                <div class="col-span-full text-center py-16 space-y-3">
+                    <i class="fa-regular fa-circle-xmark text-4xl text-red-300 block"></i>
+                    <p class="text-red-500 font-semibold">Could not load properties</p>
+                    <p class="text-gray-400 text-xs max-w-xs mx-auto">
+                        Error: <strong>${err.message}</strong><br><br>
+                        Make sure your Node server is running:<br>
+                        <code class="bg-gray-100 px-2 py-0.5 rounded font-mono text-xs">node server.js</code>
+                    </p>
+                    <button onclick="loadProperties()" class="mt-2 text-xs font-bold text-indigo-600 underline">↻ Retry</button>
+                </div>`;
+            count.innerText = '0 spaces available';
+            const pills = document.getElementById('locationPills');
+            if (pills) pills.innerHTML = '';
+        }
+    }
+
+    window.onload = loadProperties;
+    </script>
+</body>
+</html>

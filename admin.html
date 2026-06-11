@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StellarStays | Admin Panel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-navy: #0f1f3d;
+    --brand-amber: #f59e0b;
+    --brand-coral: #ef4444;
+    --brand-cream: #fdf8f0;
+    --brand-teal: #0d9488;
+    --sidebar-w: 260px;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #f0ede8; margin: 0; }
+  h1,h2,h3,.serif { font-family: 'Playfair Display', serif; }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    background: var(--brand-navy);
+    position: fixed; top: 0; left: 0; bottom: 0;
+    display: flex; flex-direction: column;
+    z-index: 40; transition: transform 0.3s ease;
+    overflow-y: auto;
+  }
+  #sidebar.hidden-mobile { transform: translateX(-100%); }
+  .nav-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 18px; border-radius: 10px; margin: 2px 10px;
+    font-size: 13px; font-weight: 600; color: #94a3b8;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: #e2e8f0; }
+  .nav-item.active { background: rgba(245,158,11,0.18); color: #f59e0b; }
+  .nav-item .icon { width: 18px; text-align: center; font-size: 14px; }
+  .nav-section { font-size: 10px; font-weight: 800; color: #475569;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 14px 20px 4px; }
+
+  /* ── Main content ── */
+  #main { margin-left: var(--sidebar-w); min-height: 100vh; }
+  #topbar {
+    background: #fff; border-bottom: 1px solid #e8e5e0;
+    padding: 0 24px; height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 30;
+  }
+  #content { padding: 28px 24px; }
+
+  /* ── Cards ── */
+  .card { background: #fff; border-radius: 16px; border: 1px solid #ede9e3; }
+  .stat-card { background: #fff; border-radius: 14px; border: 1px solid #ede9e3; padding: 20px 22px; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: #f8f7f4; font-size: 10px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #8b8278; padding: 10px 14px; text-align: left; }
+  tbody td { padding: 12px 14px; font-size: 13px; border-top: 1px solid #f0ede8; color: #374151; }
+  tbody tr:hover td { background: #fdfcfb; }
+
+  /* ── Badges ── */
+  .badge { display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-amber { background: #fef3c7; color: #92400e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-gray { background: #f3f4f6; color: #374151; }
+
+  /* ── Form inputs ── */
+  .form-input {
+    width: 100%; border: 1px solid #e5e1db; border-radius: 10px;
+    padding: 9px 13px; font-size: 13px; font-family: 'DM Sans', sans-serif;
+    color: var(--brand-navy); background: #fdfcfb; transition: all 0.2s;
+  }
+  .form-input:focus { outline: none; border-color: var(--brand-amber);
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
+  .form-label { font-size: 11px; font-weight: 700; color: #7c6f62;
+    text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; display: block; }
+
+  /* ── Buttons ── */
+  .btn { display: inline-flex; align-items: center; gap: 7px;
+    font-size: 13px; font-weight: 700; padding: 9px 18px;
+    border-radius: 10px; cursor: pointer; transition: all 0.2s; border: none; font-family: 'DM Sans', sans-serif; }
+  .btn-primary { background: var(--brand-navy); color: #fff; }
+  .btn-primary:hover { background: #162d54; }
+  .btn-amber { background: var(--brand-amber); color: #fff; }
+  .btn-amber:hover { background: #d97706; }
+  .btn-outline { background: #fff; color: #374151; border: 1px solid #e5e1db; }
+  .btn-outline:hover { background: #f8f7f4; }
+  .btn-danger { background: #ef4444; color: #fff; }
+  .btn-danger:hover { background: #dc2626; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+
+  /* ── Modal ── */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(15,31,61,0.55);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s; padding: 20px; }
+  .modal-backdrop.open { opacity: 1; pointer-events: all; }
+  .modal { background: #fff; border-radius: 20px; max-width: 620px; width: 100%;
+    max-height: 90vh; overflow-y: auto; transform: translateY(16px);
+    transition: transform 0.25s; }
+  .modal-backdrop.open .modal { transform: translateY(0); }
+
+  /* ── Tabs ── */
+  .tab-btn { padding: 8px 16px; font-size: 13px; font-weight: 600;
+    border-radius: 8px; cursor: pointer; color: #6b7280; transition: all 0.2s; }
+  .tab-btn.active { background: var(--brand-navy); color: #fff; }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* ── Chart placeholder ── */
+  .chart-bar { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+  .chart-bar > div { flex: 1; background: var(--brand-amber); border-radius: 5px 5px 0 0;
+    opacity: 0.85; transition: opacity 0.2s; min-width: 12px; }
+  .chart-bar > div:hover { opacity: 1; }
+
+  /* ── Scroll ── */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* ── Mobile overlay ── */
+  #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 39; }
+
+  @media (max-width: 768px) {
+    #sidebar { transform: translateX(-100%); }
+    #sidebar.open { transform: translateX(0); }
+    #overlay.show { display: block; }
+    #main { margin-left: 0; }
+    #content { padding: 18px 14px; }
+  }
+
+  /* ── Toast ── */
+  #toast { position: fixed; bottom: 24px; right: 24px; z-index: 200;
+    background: var(--brand-navy); color: #fff; padding: 12px 20px;
+    border-radius: 12px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 8px 30px rgba(15,31,61,0.25);
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.3s; pointer-events: none; }
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── Upload area ── */
+  .upload-area { border: 2px dashed #d6cfca; border-radius: 12px;
+    padding: 28px; text-align: center; cursor: pointer;
+    transition: all 0.2s; background: #fdfcfb; }
+  .upload-area:hover { border-color: var(--brand-amber); background: #fffbf0; }
+
+  /* ── Avatar ── */
+  .avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+    background: var(--brand-navy); display: flex; align-items: center;
+    justify-content: center; color: #fff; font-weight: 700; font-size: 13px; }
+
+  /* ── Toggle ── */
+  .toggle { position: relative; width: 42px; height: 24px; display: inline-block; }
+  .toggle input { display: none; }
+  .toggle-track { position: absolute; inset: 0; border-radius: 99px;
+    background: #d1d5db; cursor: pointer; transition: background 0.2s; }
+  .toggle input:checked + .toggle-track { background: var(--brand-teal); }
+  .toggle-thumb { position: absolute; width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; top: 3px; left: 3px; transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2); pointer-events: none; }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+  /* ── Sidebar brand ── */
+  .sidebar-brand { padding: 20px 18px 14px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<aside id="sidebar" class="no-scrollbar">
+  <div class="sidebar-brand">
+    <div class="serif text-xl font-black text-white">STELLAR<span class="text-amber-400">STAYS</span></div>
+    <div class="text-xs text-slate-500 font-semibold mt-0.5 flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Admin Panel
+    </div>
+  </div>
+
+  <nav class="mt-3 flex-1">
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" onclick="switchSection('dashboard', this)">
+      <span class="icon"><i class="fa-solid fa-gauge-high"></i></span> Dashboard
+    </div>
+
+    <div class="nav-section">Properties</div>
+    <div class="nav-item" onclick="switchSection('properties', this)">
+      <span class="icon"><i class="fa-solid fa-house"></i></span> All Properties
+    </div>
+    <div class="nav-item" onclick="openAddPropertyModal()">
+      <span class="icon"><i class="fa-solid fa-circle-plus"></i></span> Add Property
+    </div>
+
+    <div class="nav-section">Bookings</div>
+    <div class="nav-item" onclick="switchSection('bookings', this)">
+      <span class="icon"><i class="fa-solid fa-calendar-check"></i></span> All Bookings
+    </div>
+    <div class="nav-item" onclick="switchSection('calendar', this)">
+      <span class="icon"><i class="fa-regular fa-calendar"></i></span> Availability Calendar
+    </div>
+
+    <div class="nav-section">Guests</div>
+    <div class="nav-item" onclick="switchSection('guests', this)">
+      <span class="icon"><i class="fa-solid fa-users"></i></span> Guest Directory
+    </div>
+    <div class="nav-item" onclick="switchSection('reviews', this)">
+      <span class="icon"><i class="fa-solid fa-star"></i></span> Reviews
+    </div>
+
+    <div class="nav-section">Revenue</div>
+    <div class="nav-item" onclick="switchSection('revenue', this)">
+      <span class="icon"><i class="fa-solid fa-chart-line"></i></span> Revenue Report
+    </div>
+    <div class="nav-item" onclick="switchSection('payouts', this)">
+      <span class="icon"><i class="fa-solid fa-money-bill-transfer"></i></span> Host Payouts
+    </div>
+
+    <div class="nav-section">Platform</div>
+    <div class="nav-item" onclick="switchSection('promo', this)">
+      <span class="icon"><i class="fa-solid fa-tag"></i></span> Promo Codes
+    </div>
+    <div class="nav-item" onclick="switchSection('settings', this)">
+      <span class="icon"><i class="fa-solid fa-gear"></i></span> Settings
+    </div>
+  </nav>
+
+  <div class="p-4 border-t border-white/10 mt-auto">
+    <div class="flex items-center gap-3">
+      <div class="avatar shrink-0">AS</div>
+      <div class="min-w-0">
+        <div class="text-xs font-bold text-gray-200 truncate">Admin Staff</div>
+        <div class="text-[10px] text-slate-500">admin@stellarstays.in</div>
+      </div>
+      <button class="ml-auto text-slate-500 hover:text-red-400 text-sm transition" title="Logout">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<div id="main">
+
+  <!-- Top bar -->
+  <div id="topbar">
+    <div class="flex items-center gap-3">
+      <button class="md:hidden text-gray-500 hover:text-gray-800 text-xl" onclick="openMobileSidebar()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div id="pageTitle" class="font-black text-[--brand-navy] text-base serif">Dashboard</div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-1.5 text-xs font-semibold text-gray-400">
+        <span id="refreshDot" class="w-2 h-2 rounded-full bg-gray-300 inline-block"></span>
+        <span id="refreshLabel">Connecting…</span>
+      </div>
+      <div class="relative" id="notifWrapper">
+        <button class="relative text-gray-400 hover:text-gray-700 text-lg transition" onclick="toggleNotifications()" id="notifBell">
+          <i class="fa-regular fa-bell"></i>
+          <span id="notifBadge" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-black rounded-full items-center justify-center hidden">0</span>
+        </button>
+        <!-- Notifications Dropdown -->
+        <div id="notifDropdown" class="hidden absolute right-0 top-10 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+          <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+            <span class="font-black text-[--brand-navy] text-sm">Notifications</span>
+            <button onclick="markAllRead()" class="text-[10px] font-bold text-amber-600 hover:text-amber-700">Mark all read</button>
+          </div>
+          <div id="notifList" class="max-h-80 overflow-y-auto divide-y divide-gray-50"></div>
+          <div class="px-4 py-3 text-center border-t border-gray-100">
+            <button onclick="toggleNotifications()" class="text-xs font-bold text-gray-400 hover:text-gray-600">Close</button>
+          </div>
+        </div>
+      </div>
+      <a href="index.html" class="btn btn-outline btn-sm text-xs hidden md:flex">
+        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> View Site
+      </a>
+      <div class="avatar shrink-0 cursor-pointer text-xs">AS</div>
+    </div>
+  </div>
+
+  <!-- ══ CONTENT SECTIONS ══ -->
+  <div id="content">
+
+    <!-- ═══════ DASHBOARD ═══════ -->
+    <section id="section-dashboard" class="tab-pane active">
+      <!-- Stats row -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+              <i class="fa-solid fa-house text-amber-500 text-base"></i>
+            </div>
+            
+          </div>
+          <div id="statActiveProps" class="text-2xl font-black text-[--brand-navy] serif">—</div>
+          <div class="text-xs text-gray-400 font-semibold mt-0.5">Active Properties</div>
+        </div>
+        <div class="stat-card">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
+              <i class="fa-solid fa-calendar-check text-teal-500 text-base"></i>
+            </div>
+            
+          </div>
+          <div id="statTotalBookings" class="text-2xl font-black text-[--brand-navy] serif">—</div>
+          <div class="text-xs text-gray-400 font-semibold mt-0.5">Total Bookings</div>
+        </div>
+        <div class="stat-card">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
+              <i class="fa-solid fa-indian-rupee-sign text-green-500 text-base"></i>
+            </div>
+            
+          </div>
+          <div id="statRevenueMTD" class="text-2xl font-black text-[--brand-navy] serif">—</div>
+          <div class="text-xs text-gray-400 font-semibold mt-0.5">Revenue (MTD)</div>
+        </div>
+        <div class="stat-card">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
+              <i class="fa-solid fa-star text-purple-500 text-base"></i>
+            </div>
+            
+          </div>
+          <div id="statAvgRating" class="text-2xl font-black text-[--brand-navy] serif">—</div>
+          <div class="text-xs text-gray-400 font-semibold mt-0.5">Avg Rating</div>
+        </div>
+      </div>
+
+      <!-- Charts + Recent -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+        <!-- Revenue chart -->
+        <div class="card p-5 lg:col-span-2">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <div class="font-black text-[--brand-navy] text-sm">Revenue Trend</div>
+              <div class="text-xs text-gray-400 font-medium">Last 8 months</div>
+            </div>
+            <span id="revenueBadge" class="badge badge-amber">Loading…</span>
+          </div>
+          <div id="revenueChart" class="chart-bar">
+            <div class="col-span-full text-xs text-gray-300 font-semibold self-center w-full text-center">Loading chart…</div>
+          </div>
+          <div class="flex justify-between text-[10px] text-gray-400 font-semibold mt-2">
+            <span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span>
+            <span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+          </div>
+        </div>
+
+        <!-- Booking by type -->
+        <div class="card p-5">
+          <div class="font-black text-[--brand-navy] text-sm mb-4">Bookings by Type</div>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-gray-600">Villa</span><span class="font-black text-[--brand-navy]">62%</span>
+              </div>
+              <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full bg-amber-400" style="width:62%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-gray-600">Farmstay</span><span class="font-black text-[--brand-navy]">23%</span>
+              </div>
+              <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full bg-teal-400" style="width:23%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-gray-600">Homestay</span><span class="font-black text-[--brand-navy]">15%</span>
+              </div>
+              <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full bg-rose-400" style="width:15%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-4 border-t border-gray-100 space-y-2">
+            <div class="flex justify-between text-xs font-semibold text-gray-600">
+              <span>Occupancy rate</span><span class="text-[--brand-navy] font-black">73%</span>
+            </div>
+            <div class="flex justify-between text-xs font-semibold text-gray-600">
+              <span>Pending check-ins today</span><span class="text-[--brand-navy] font-black">4</span>
+            </div>
+            <div class="flex justify-between text-xs font-semibold text-gray-600">
+              <span>Cancellation rate</span><span class="text-red-500 font-black">6.2%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent bookings -->
+      <div class="card overflow-hidden">
+        <div class="flex items-center justify-between p-5 border-b border-gray-100">
+          <div class="font-black text-[--brand-navy] text-sm">Recent Bookings</div>
+          <button class="btn btn-outline btn-sm" onclick="switchSection('bookings', null)">View All</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Booking ID</th><th>Guest</th><th>Property</th>
+                <th>Check-in</th><th>Check-out</th><th>Amount</th><th>Status</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="recentBookingsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ PROPERTIES ═══════ -->
+    <section id="section-properties" class="tab-pane">
+      <div class="flex flex-wrap gap-3 items-center justify-between mb-5">
+        <div class="flex gap-2 flex-wrap">
+          <input type="text" class="form-input" style="max-width:220px" placeholder="🔍  Search properties..." id="propSearch" oninput="filterProperties()">
+          <select class="form-input" style="max-width:160px" id="propTypeFilter" onchange="filterProperties()">
+            <option value="">All Types</option>
+            <option>Villa</option><option>Farmstay</option><option>Homestay</option>
+          </select>
+          <select class="form-input" style="max-width:160px" id="propStatusFilter" onchange="filterProperties()">
+            <option value="">All Status</option>
+            <option>Active</option><option>Inactive</option><option>Pending Review</option>
+          </select>
+        </div>
+        <button class="btn btn-amber" onclick="openAddPropertyModal()">
+          <i class="fa-solid fa-plus"></i> Add Property
+        </button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4" id="propertyGrid"></div>
+    </section>
+
+    <!-- ═══════ BOOKINGS ═══════ -->
+    <section id="section-bookings" class="tab-pane">
+      <div class="flex flex-wrap gap-3 items-center justify-between mb-5">
+        <div class="flex gap-2 flex-wrap">
+          <input type="text" class="form-input" style="max-width:220px" placeholder="🔍  Search bookings...">
+          <select class="form-input" style="max-width:160px" id="bookingStatusFilter" onchange="filterBookings()">
+            <option value="">All Status</option>
+            <option>Confirmed</option><option>Pending</option><option>Cancelled</option><option>Completed</option>
+          </select>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="showToast('CSV export started')">
+          <i class="fa-solid fa-download"></i> Export CSV
+        </button>
+      </div>
+      <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Booking ID</th><th>Guest</th><th>Property</th>
+                <th>Check-in</th><th>Check-out</th><th>Nights</th>
+                <th>Amount</th><th>Add-ons</th><th>Status</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="allBookingsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ CALENDAR ═══════ -->
+    <section id="section-calendar" class="tab-pane">
+      <div class="flex flex-col sm:flex-row gap-3 mb-5 sm:items-center">
+        <select class="form-input w-full sm:w-auto sm:max-w-[280px]" id="calPropSelect" onchange="onCalPropChange()">
+          <option value="">— Select Property —</option>
+        </select>
+        <div class="flex items-center gap-2 justify-between sm:justify-start">
+          <button onclick="calChangeMonth(-1)" class="btn btn-outline btn-sm"><i class="fa-solid fa-chevron-left"></i></button>
+          <span id="calMonthLabel" class="btn btn-outline btn-sm font-black text-[--brand-navy] min-w-[140px] text-center cursor-default"></span>
+          <button onclick="calChangeMonth(1)" class="btn btn-outline btn-sm"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <span class="text-xs text-gray-400 font-semibold sm:ml-2">Click any available date to block/unblock it</span>
+      </div>
+      <div class="card p-4 sm:p-5">
+        <div id="calendarGrid" class="grid grid-cols-7 gap-1 sm:gap-2"></div>
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-5 text-xs font-semibold text-gray-500 sm:flex-wrap sm:items-center">
+          <div class="flex flex-wrap gap-3 sm:gap-4">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-gray-100 border border-gray-200"></span> Available</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-400"></span> Booked</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-red-300"></span> Blocked by Admin</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-teal-300"></span> Check-in / Check-out</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-gray-300"></span> Past</span>
+          </div>
+          <button id="calSaveBtn" onclick="saveBlockedDates()" class="btn btn-amber btn-sm w-full sm:w-auto sm:ml-auto hidden">
+            <i class="fa-solid fa-floppy-disk"></i> Save Changes
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ GUESTS ═══════ -->
+    <section id="section-guests" class="tab-pane">
+      <div class="flex gap-3 mb-5 flex-wrap items-center justify-between">
+        <input type="text" class="form-input" style="max-width:240px" placeholder="🔍  Search guests...">
+        <span class="text-xs text-gray-400 font-semibold">Total: <strong id="guestCount" class="text-[--brand-navy]">—</strong></span>
+      </div>
+      <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Guest</th><th>Phone / Email</th><th>Stays</th>
+                <th>Total Spent</th><th>Last Stay</th><th>Rating Given</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="guestsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ REVIEWS ═══════ -->
+    <section id="section-reviews" class="tab-pane">
+      <div class="flex gap-3 mb-5 flex-wrap items-center justify-between">
+        <select class="form-input" style="max-width:200px" id="reviewFilter" onchange="renderReviews()">
+          <option value="">All Ratings</option>
+          <option value="5">5 Stars</option><option value="4">4 Stars</option>
+          <option value="3">3 Stars</option><option value="below3">Below 3</option>
+        </select>
+        <div class="flex items-center gap-2 text-xs text-gray-500 font-semibold">
+          Avg: <span id="reviewAvgRating" class="text-amber-500 font-black text-base">—</span>
+          <i class="fa-solid fa-star text-amber-400"></i> across <span id="reviewCount">—</span> reviews
+        </div>
+      </div>
+      <div class="space-y-3" id="reviewsContainer"></div>
+    </section>
+
+    <!-- ═══════ REVENUE ═══════ -->
+    <section id="section-revenue" class="tab-pane">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card">
+          <div class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">This Month</div>
+          <div id="revThisMonth" class="text-2xl font-black text-[--brand-navy] serif">—</div>
+          <div id="revThisMonthSub" class="text-xs text-gray-400 font-semibold mt-1">from confirmed bookings</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">All Time</div>
+          <div id="revAllTime" class="text-2xl font-black text-[--brand-navy] serif">—</div>
+          <div class="text-xs text-gray-400 font-semibold mt-1">total revenue</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Avg Booking Value</div>
+          <div id="revAvgBooking" class="text-2xl font-black text-[--brand-navy] serif">—</div>
+          <div class="text-xs text-gray-400 font-semibold mt-1">per confirmed booking</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Pending Bookings</div>
+          <div id="revPendingCount" class="text-2xl font-black text-[--brand-navy] serif">—</div>
+          <div class="text-xs text-gray-400 font-semibold mt-1">awaiting confirmation</div>
+        </div>
+      </div>
+      <div class="card p-5">
+        <div class="font-black text-[--brand-navy] text-sm mb-4">Bookings Breakdown</div>
+        <div class="overflow-x-auto">
+          <table>
+            <thead><tr><th>Booking ID</th><th>Guest</th><th>Property</th><th>Check-in</th><th>Nights</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody id="revenueBreakdownBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ PAYOUTS ═══════ -->
+    <section id="section-payouts" class="tab-pane">
+      <div class="flex gap-3 mb-5 flex-wrap items-center justify-between">
+        <div class="text-sm font-semibold text-gray-500">Host payout queue for <strong class="text-[--brand-navy]">June 2026</strong></div>
+        <button class="btn btn-amber btn-sm" onclick="showToast('Bulk payout initiated for all pending hosts')">
+          <i class="fa-solid fa-money-bill-wave"></i> Process All Pending
+        </button>
+      </div>
+      <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table>
+            <thead><tr><th>Host</th><th>Property</th><th>Bookings</th><th>Gross</th><th>Commission</th><th>Payout</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="payoutsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ PROMO CODES ═══════ -->
+    <section id="section-promo" class="tab-pane">
+      <div class="flex gap-3 mb-5 items-center justify-between flex-wrap">
+        <div class="text-sm font-semibold text-gray-500">Active promo codes</div>
+        <button class="btn btn-amber" onclick="openPromoModal()">
+          <i class="fa-solid fa-plus"></i> Create Promo
+        </button>
+      </div>
+      <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table>
+            <thead><tr><th>Code</th><th>Discount</th><th>Type</th><th>Used / Limit</th><th>Expires</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="promoBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ SETTINGS ═══════ -->
+    <section id="section-settings" class="tab-pane">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <!-- General -->
+        <div class="lg:col-span-2 space-y-5">
+          <div class="card p-5">
+            <div class="font-black text-[--brand-navy] mb-4">Site Settings</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><label class="form-label">Site Name</label><input class="form-input" value="StellarStays"></div>
+              <div><label class="form-label">Support Phone</label><input class="form-input" value="+91 98765 43210"></div>
+              <div><label class="form-label">Support Email</label><input class="form-input" value="hello@stellarstays.in"></div>
+              <div><label class="form-label">WhatsApp Number</label><input class="form-input" value="919876543210"></div>
+              <div class="sm:col-span-2"><label class="form-label">GST Number</label><input class="form-input" value="27AABCS1429B1Z1"></div>
+            </div>
+            <button class="btn btn-primary mt-4" onclick="showToast('Settings saved successfully')">Save Changes</button>
+          </div>
+
+          <div class="card p-5">
+            <div class="font-black text-[--brand-navy] mb-4">Booking Rules</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><label class="form-label">Min. Advance Booking (days)</label><input class="form-input" value="1" type="number"></div>
+              <div><label class="form-label">Max. Advance Booking (days)</label><input class="form-input" value="365" type="number"></div>
+              <div><label class="form-label">Default Check-in Time</label><input class="form-input" value="14:00" type="time"></div>
+              <div><label class="form-label">Default Check-out Time</label><input class="form-input" value="11:00" type="time"></div>
+              <div><label class="form-label">Cancellation Policy (days)</label><input class="form-input" value="7" type="number"></div>
+              <div><label class="form-label">GST Rate (%)</label><input class="form-input" value="18" type="number"></div>
+            </div>
+            <button class="btn btn-primary mt-4" onclick="showToast('Booking rules saved')">Save Rules</button>
+          </div>
+        </div>
+
+        <!-- Toggles -->
+        <div class="space-y-5">
+          <div class="card p-5">
+            <div class="font-black text-[--brand-navy] mb-4">Feature Toggles</div>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-bold text-gray-700">New Bookings</div>
+                  <div class="text-xs text-gray-400">Accept incoming bookings</div>
+                </div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-bold text-gray-700">Promo Codes</div>
+                  <div class="text-xs text-gray-400">Allow guests to apply codes</div>
+                </div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-bold text-gray-700">Guest Reviews</div>
+                  <div class="text-xs text-gray-400">Display public reviews</div>
+                </div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-bold text-gray-700">WhatsApp Chat</div>
+                  <div class="text-xs text-gray-400">Show floating WA button</div>
+                </div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-bold text-gray-700">Stayflexi Integration</div>
+                  <div class="text-xs text-gray-400">Show real-time availability</div>
+                </div>
+                <label class="toggle"><input type="checkbox"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-5">
+            <div class="font-black text-[--brand-navy] mb-3">Stayflexi Config</div>
+            <label class="form-label">Hotel ID</label>
+            <input class="form-input mb-3" placeholder="SF_HOTEL_xxxxx">
+            <button class="btn btn-outline btn-sm w-full" onclick="showToast('Stayflexi connection tested successfully')">
+              <i class="fa-solid fa-plug"></i> Test Connection
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ═══════ ADD PROPERTY MODAL ═══════ -->
+<div class="modal-backdrop" id="propertyModal" onclick="closeModalOutside(event, 'propertyModal')">
+  <div class="modal">
+    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+      <div class="font-black text-[--brand-navy] serif" id="propertyModalTitle">Add New Property</div>
+      <button onclick="closeModal('propertyModal')" class="text-gray-400 hover:text-gray-700 text-xl"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="p-5 space-y-4">
+      <!-- Tabs -->
+      <div class="flex gap-1 bg-gray-100 p-1 rounded-xl">
+        <button class="tab-btn active flex-1" onclick="switchModalTab(this,'tab-basic')">Basic Info</button>
+        <button class="tab-btn flex-1" onclick="switchModalTab(this,'tab-pricing')">Pricing</button>
+        <button class="tab-btn flex-1" onclick="switchModalTab(this,'tab-media')">Media</button>
+        <button class="tab-btn flex-1" onclick="switchModalTab(this,'tab-reviews')">Reviews</button>
+        <button class="tab-btn flex-1" onclick="switchModalTab(this,'tab-faqs')">FAQs</button>
+      </div>
+
+      <!-- Basic -->
+      <div id="tab-basic" class="tab-pane active space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="col-span-2"><label class="form-label">Property Name *</label>
+            <input class="form-input" id="prop_name" placeholder="e.g. Serene Hills Villa, Coorg"></div>
+          <div><label class="form-label">Type *</label>
+            <select class="form-input" id="prop_type">
+              <option>Villa</option><option>Farmstay</option><option>Homestay</option>
+            </select></div>
+          <div><label class="form-label">Location *</label>
+            <input class="form-input" id="prop_location" placeholder="Coorg, Karnataka"></div>
+          <div><label class="form-label">Bedrooms</label>
+            <input class="form-input" id="prop_beds" type="number" placeholder="4"></div>
+          <div><label class="form-label">Max Guests</label>
+            <input class="form-input" id="prop_guests" type="number" placeholder="10"></div>
+          <div class="col-span-2"><label class="form-label">Description</label>
+            <textarea class="form-input" id="prop_desc" rows="3" placeholder="Describe the property experience..."></textarea></div>
+          <div class="col-span-2"><label class="form-label">Amenities (comma-separated)</label>
+            <input class="form-input" id="prop_amenities" placeholder="Private Pool, AC, Chef, Bonfire, Parking"></div>
+          <div><label class="form-label">Pets Allowed?</label>
+            <select class="form-input" id="prop_pets"><option>No</option><option>Yes</option></select></div>
+          <div><label class="form-label">Status</label>
+            <select class="form-input" id="prop_status">
+              <option>Active</option><option>Inactive</option><option>Pending Review</option>
+            </select></div>
+          <div class="col-span-2"><label class="form-label">Google Maps Embed URL</label>
+            <input class="form-input" id="prop_map" placeholder="https://maps.google.com/..."></div>
+        </div>
+      </div>
+
+      <!-- Pricing -->
+      <div id="tab-pricing" class="tab-pane space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="form-label">Weekday Rate (₹/night) *</label>
+            <input class="form-input" id="prop_weekday" type="number" placeholder="12000"></div>
+          <div><label class="form-label">Weekend Rate (₹/night) *</label>
+            <input class="form-input" id="prop_weekend" type="number" placeholder="15000"></div>
+          <div><label class="form-label">Security Deposit (₹)</label>
+            <input class="form-input" id="prop_deposit" type="number" placeholder="10000"></div>
+          <div><label class="form-label">Min. Stay (nights)</label>
+            <input class="form-input" id="prop_minstay" type="number" placeholder="2"></div>
+          <div class="col-span-2"><label class="form-label">Stayflexi Hotel ID (optional)</label>
+            <input class="form-input" id="prop_stayflexi" placeholder="SF_HOTEL_xxxxx"></div>
+        </div>
+      </div>
+
+      <!-- Media -->
+      <div id="tab-media" class="tab-pane space-y-4">
+        <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 flex gap-2 text-xs text-blue-700 font-medium">
+          <i class="fa-solid fa-circle-info mt-0.5 shrink-0"></i>
+          <span>Paste a web URL <strong>or</strong> click "Upload from Device" to use a local image (converted to base64).</span>
+        </div>
+        <div>
+          <label class="form-label">Cover Image <span class="text-red-400">*</span></label>
+          <div class="flex gap-2 mb-2">
+            <input class="form-input flex-1" id="prop_img"
+                   placeholder="https://images.unsplash.com/photo-xxx?w=800&q=80"
+                   oninput="handleUrlInput(this)"
+                   onpaste="handleUrlPaste(event,this)">
+            <label class="btn btn-outline btn-sm shrink-0 cursor-pointer" title="Upload from device">
+              <i class="fa-solid fa-upload"></i>
+              <input type="file" accept="image/*" class="hidden" onchange="handleCoverUpload(event)">
+            </label>
+          </div>
+          <div id="coverPreviewWrap" class="mt-2 hidden">
+            <img id="coverPreview" src="" alt="Cover preview"
+                 class="w-full h-36 object-cover rounded-xl border border-gray-200"
+                 onerror="this.parentElement.classList.add('hidden')">
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Property Rating (1–5)</label>
+          <input class="form-input" id="prop_rating" type="number" min="1" max="5" step="0.1" placeholder="4.8">
+        </div>
+        <div>
+          <label class="form-label">Gallery Images — paste URLs or upload from device (up to 6)</label>
+          <div class="space-y-2" id="galleryInputs">
+            <div class="flex gap-2"><input class="form-input gallery-url flex-1" placeholder="Gallery image 1 — paste https:// URL" oninput="handleUrlInput(this)" onpaste="handleUrlPaste(event,this)"><label class="btn btn-outline btn-sm shrink-0 cursor-pointer" title="Upload"><i class="fa-solid fa-upload"></i><input type="file" accept="image/*" class="hidden" onchange="handleGalleryUpload(event,this)"></label></div>
+            <div class="flex gap-2"><input class="form-input gallery-url flex-1" placeholder="Gallery image 2 — paste https:// URL" oninput="handleUrlInput(this)" onpaste="handleUrlPaste(event,this)"><label class="btn btn-outline btn-sm shrink-0 cursor-pointer" title="Upload"><i class="fa-solid fa-upload"></i><input type="file" accept="image/*" class="hidden" onchange="handleGalleryUpload(event,this)"></label></div>
+            <div class="flex gap-2"><input class="form-input gallery-url flex-1" placeholder="Gallery image 3 — paste https:// URL" oninput="handleUrlInput(this)" onpaste="handleUrlPaste(event,this)"><label class="btn btn-outline btn-sm shrink-0 cursor-pointer" title="Upload"><i class="fa-solid fa-upload"></i><input type="file" accept="image/*" class="hidden" onchange="handleGalleryUpload(event,this)"></label></div>
+          </div>
+          <button type="button" onclick="addGalleryRow()"
+                  class="mt-2 text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-1">
+            <i class="fa-solid fa-plus"></i> Add another image
+          </button>
+        </div>
+        <div class="flex items-center justify-between bg-gray-50 rounded-xl p-3 border border-gray-100">
+          <div>
+            <div class="text-sm font-bold text-gray-700">🔥 Mark as Hot Price</div>
+            <div class="text-xs text-gray-400">Shows the "Hot Price" badge on the listing card</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="prop_hot">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+      <!-- Reviews Tab -->
+      <div id="tab-reviews" class="tab-pane space-y-3">
+        <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 flex gap-2 text-xs text-amber-700 font-medium mb-2">
+          <i class="fa-solid fa-star mt-0.5 shrink-0"></i>
+          <span>Add guest reviews that appear on the property booking page.</span>
+        </div>
+        <div id="reviewsList" class="space-y-3"></div>
+        <button type="button" onclick="addReviewRow()"
+                class="mt-1 w-full btn btn-outline btn-sm text-xs">
+          <i class="fa-solid fa-plus"></i> Add Review
+        </button>
+      </div>
+
+      <!-- FAQs Tab -->
+      <div id="tab-faqs" class="tab-pane space-y-3">
+        <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 flex gap-2 text-xs text-blue-700 font-medium mb-2">
+          <i class="fa-solid fa-circle-info mt-0.5 shrink-0"></i>
+          <span>Add FAQs that appear on the property booking page.</span>
+        </div>
+        <div id="faqsList" class="space-y-3"></div>
+        <button type="button" onclick="addFaqRow()"
+                class="mt-1 w-full btn btn-outline btn-sm text-xs">
+          <i class="fa-solid fa-plus"></i> Add FAQ
+        </button>
+      </div>
+    </div>
+    <div class="p-5 border-t border-gray-100 flex gap-3 justify-end">
+      <button class="btn btn-outline" onclick="closeModal('propertyModal')">Cancel</button>
+      <button class="btn btn-amber" onclick="saveProperty()">
+        <i class="fa-solid fa-check"></i> Save Property
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ BOOKING DETAIL MODAL ═══════ -->
+<div class="modal-backdrop" id="bookingModal" onclick="closeModalOutside(event, 'bookingModal')">
+  <div class="modal">
+    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+      <div class="font-black text-[--brand-navy] serif">Booking Details</div>
+      <button onclick="closeModal('bookingModal')" class="text-gray-400 hover:text-gray-700 text-xl"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="p-5 space-y-4" id="bookingModalBody"></div>
+    <div class="p-5 border-t border-gray-100 flex gap-3 justify-end flex-wrap">
+      <button class="btn btn-outline btn-sm" onclick="showToast('Booking confirmation resent to guest')">
+        <i class="fa-solid fa-paper-plane"></i> Resend Confirmation
+      </button>
+      <button class="btn btn-danger btn-sm" onclick="closeModal('bookingModal');showToast('Booking cancelled and guest notified')">
+        <i class="fa-solid fa-ban"></i> Cancel Booking
+      </button>
+      <button class="btn btn-primary btn-sm" onclick="closeModal('bookingModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PROMO MODAL ═══════ -->
+<div class="modal-backdrop" id="promoModal" onclick="closeModalOutside(event,'promoModal')">
+  <div class="modal">
+    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+      <div class="font-black text-[--brand-navy] serif">Create Promo Code</div>
+      <button onclick="closeModal('promoModal')" class="text-gray-400 hover:text-gray-700 text-xl"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="p-5 space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="form-label">Code *</label>
+          <input class="form-input" id="promo_code" placeholder="SUMMER25"></div>
+        <div><label class="form-label">Discount *</label>
+          <input class="form-input" id="promo_discount" placeholder="25" type="number"></div>
+        <div><label class="form-label">Type</label>
+          <select class="form-input" id="promo_type"><option>Percentage</option><option>Flat ₹</option></select></div>
+        <div><label class="form-label">Max Uses</label>
+          <input class="form-input" id="promo_max" placeholder="100" type="number"></div>
+        <div><label class="form-label">Expires</label>
+          <input class="form-input" id="promo_exp" type="date"></div>
+        <div><label class="form-label">Min. Booking Value (₹)</label>
+          <input class="form-input" id="promo_min" placeholder="10000" type="number"></div>
+      </div>
+    </div>
+    <div class="p-5 border-t border-gray-100 flex gap-3 justify-end">
+      <button class="btn btn-outline" onclick="closeModal('promoModal')">Cancel</button>
+      <button class="btn btn-amber" onclick="savePromo()">Create Code</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIG — FIX: smart API base (no hardcoded localhost)
+// ═══════════════════════════════════════════
+function getApiBase() {
+  const { hostname, port } = window.location;
+  return (port && port !== '5000') ? `http://${hostname}:5000/api` : '/api';
+}
+const API = (() => getApiBase())(); // evaluated once at load
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let PROPERTIES = [];
+let BOOKINGS   = [];
+
+// ═══════════════════════════════════════════
+// API HELPERS
+// ═══════════════════════════════════════════
+async function apiFetch(path, options = {}) {
+  const res = await fetch(getApiBase() + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(err.message || res.statusText);
+  }
+  return res.json();
+}
+
+// ═══════════════════════════════════════════
+// LOAD DATA
+// ═══════════════════════════════════════════
+async function loadProperties() {
+  try {
+    PROPERTIES = await apiFetch('/properties');
+    renderProperties();
+    updateDashboardStats();
+  } catch (e) {
+    showToast('⚠️ Could not load properties: ' + e.message);
+  }
+}
+
+async function loadBookings() {
+  try {
+    BOOKINGS = await apiFetch('/bookings');
+    renderBookings();
+    updateDashboardStats();
+  } catch (e) {
+    showToast('⚠️ Could not load bookings: ' + e.message);
+  }
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD STATS
+// ═══════════════════════════════════════════
+function updateDashboardStats() {
+  const activePropCount = PROPERTIES.filter(p => (p.status || 'Active') === 'Active').length;
+  const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+
+  setText('statActiveProps',   activePropCount || PROPERTIES.length);
+  setText('statTotalBookings', BOOKINGS.length);
+
+  const confirmedBookings = BOOKINGS.filter(b => ['Confirmed','Completed','confirmed','completed'].includes(b.status));
+  const mtd = confirmedBookings.reduce((s, b) => s + (b.amount || b.totalAmount || 0), 0);
+  setText('statRevenueMTD', fmt(mtd));
+
+  const ratedProps = PROPERTIES.filter(p => p.rating);
+  const avgRating  = ratedProps.length
+    ? (ratedProps.reduce((s, p) => s + p.rating, 0) / ratedProps.length).toFixed(2) : '—';
+  setText('statAvgRating', avgRating);
+
+  const revBadge = document.getElementById('revenueBadge');
+  if (revBadge) revBadge.textContent = fmt(mtd) + ' confirmed';
+
+  const chartEl = document.getElementById('revenueChart');
+  if (chartEl && BOOKINGS.length) {
+    const monthTotals = {};
+    BOOKINGS.filter(b => ['Confirmed','Completed','confirmed','completed'].includes(b.status)).forEach(b => {
+      const key = (b.checkIn || '').slice(0, 7);
+      if (key) monthTotals[key] = (monthTotals[key] || 0) + (b.amount || b.totalAmount || 0);
+    });
+    const months = Object.keys(monthTotals).sort().slice(-8);
+    if (months.length) {
+      const maxVal = Math.max(...months.map(m => monthTotals[m]));
+      chartEl.innerHTML = months.map(m => {
+        const pct   = Math.max(8, Math.round((monthTotals[m] / maxVal) * 100));
+        const label = new Date(m + '-01').toLocaleString('en-IN', { month:'short', year:'2-digit' });
+        return `<div style="height:${pct}%" title="${label}: ${fmt(monthTotals[m])}"></div>`;
+      }).join('');
+    } else {
+      chartEl.innerHTML = '<div class="text-xs text-gray-300 font-semibold self-center w-full text-center">No confirmed bookings yet</div>';
+    }
+  } else if (chartEl) {
+    chartEl.innerHTML = '<div class="text-xs text-gray-300 font-semibold self-center w-full text-center">No bookings yet</div>';
+  }
+
+  const now          = new Date();
+  const thisMonthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const thisMonthAmt = BOOKINGS.filter(b => ['Confirmed','Completed','confirmed','completed'].includes(b.status) && (b.checkIn||'').startsWith(thisMonthKey))
+    .reduce((s, b) => s + (b.amount || b.totalAmount || 0), 0);
+  const allTimeAmt   = BOOKINGS.filter(b => ['Confirmed','Completed','confirmed','completed'].includes(b.status))
+    .reduce((s, b) => s + (b.amount || b.totalAmount || 0), 0);
+  const avgBooking   = confirmedBookings.length ? Math.round(allTimeAmt / confirmedBookings.length) : 0;
+  const pendingCount = BOOKINGS.filter(b => ['Pending','pending'].includes(b.status)).length;
+
+  setText('revThisMonth',    thisMonthAmt ? fmt(thisMonthAmt) : '₹0');
+  setText('revAllTime',      allTimeAmt   ? fmt(allTimeAmt)   : '₹0');
+  setText('revAvgBooking',   avgBooking   ? fmt(avgBooking)   : '₹0');
+  setText('revPendingCount', pendingCount);
+
+  const revBody = document.getElementById('revenueBreakdownBody');
+  if (revBody) {
+    revBody.innerHTML = BOOKINGS.length
+      ? [...BOOKINGS].sort((a,b) => (b.checkIn||'').localeCompare(a.checkIn||'')).map(b => `
+          <tr>
+            <td class="text-xs font-black text-[--brand-navy]">${b.bookingRef || b._id?.slice(-6).toUpperCase() || '—'}</td>
+            <td class="text-xs font-semibold">${b.guestName || '—'}</td>
+            <td class="text-xs text-gray-600">${b.propertyName || '—'}</td>
+            <td class="text-xs text-gray-600">${b.checkIn || '—'}</td>
+            <td class="text-xs font-black text-[--brand-navy]">${b.nights || '—'}</td>
+            <td class="text-xs font-black text-green-600">${fmt(b.amount || b.totalAmount || 0)}</td>
+            <td>${statusBadge(b.status||'Pending')}</td>
+          </tr>`).join('')
+      : '<tr><td colspan="7" class="text-center text-gray-400 py-8 text-xs">No bookings yet.</td></tr>';
+  }
+
+  const uniqueGuests = new Set(BOOKINGS.map(b => b.guestEmail).filter(Boolean));
+  const gcEl = document.getElementById('guestCount');
+  if (gcEl) gcEl.textContent = uniqueGuests.size + ' guests';
+}
+
+// ═══════════════════════════════════════════
+// UI UTILS
+// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════
+const NOTIFICATIONS = [];
+
+function renderNotifList() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  if (NOTIFICATIONS.length === 0) {
+    list.innerHTML = '<div class="px-4 py-8 text-center text-xs text-gray-400 font-semibold">No notifications</div>';
+    return;
+  }
+  list.innerHTML = NOTIFICATIONS.map(n => `
+    <div class="flex gap-3 px-4 py-3 hover:bg-gray-50 transition cursor-pointer ${n.read ? 'opacity-60' : ''}" onclick="readNotif(${n.id})">
+      <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-lg shrink-0">${n.icon}</div>
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-start gap-2">
+          <span class="text-xs font-black text-[--brand-navy]">${n.title}</span>
+          <span class="text-[10px] text-gray-400 font-semibold whitespace-nowrap">${n.time}</span>
+        </div>
+        <p class="text-[11px] text-gray-500 font-medium mt-0.5 leading-snug">${n.msg}</p>
+      </div>
+      ${!n.read ? '<span class="w-2 h-2 rounded-full bg-red-500 shrink-0 mt-1"></span>' : ''}
+    </div>`).join('');
+}
+
+function updateNotifBadge() {
+  const unread = NOTIFICATIONS.filter(n => !n.read).length;
+  const badge = document.getElementById('notifBadge');
+  if (!badge) return;
+  if (unread > 0) {
+    badge.textContent = unread;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+function toggleNotifications() {
+  const drop = document.getElementById('notifDropdown');
+  if (!drop) return;
+  const isHidden = drop.classList.contains('hidden');
+  drop.classList.toggle('hidden');
+  if (isHidden) {
+    renderNotifList();
+    updateNotifBadge();
+  }
+}
+
+function readNotif(id) {
+  const n = NOTIFICATIONS.find(n => n.id === id);
+  if (n) n.read = true;
+  renderNotifList();
+  updateNotifBadge();
+}
+
+function markAllRead() {
+  NOTIFICATIONS.forEach(n => n.read = true);
+  renderNotifList();
+  updateNotifBadge();
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const wrapper = document.getElementById('notifWrapper');
+  if (wrapper && !wrapper.contains(e.target)) {
+    document.getElementById('notifDropdown')?.classList.add('hidden');
+  }
+});
+
+// Add new notification (called by silentRefresh for new bookings/properties)
+function addNotification(icon, title, msg) {
+  NOTIFICATIONS.unshift({ id: Date.now(), icon, title, msg, time: 'Just now', read: false });
+  if (NOTIFICATIONS.length > 20) NOTIFICATIONS.pop(); // cap at 20
+  updateNotifBadge();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModalOutside(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+function switchSection(name, el) {
+  document.querySelectorAll('.tab-pane').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const titles = {
+    dashboard:'Dashboard', properties:'Properties', bookings:'Bookings',
+    calendar:'Availability Calendar', guests:'Guest Directory',
+    reviews:'Reviews', revenue:'Revenue Report', payouts:'Host Payouts',
+    promo:'Promo Codes', settings:'Settings'
+  };
+  document.getElementById('pageTitle').textContent = titles[name] || name;
+  if (name === 'calendar') renderCalendar();
+  if (name === 'guests')   renderGuests();
+  if (name === 'reviews')  renderReviews();
+  if (name === 'payouts')  renderPayouts();
+  if (name === 'promo')    renderPromos();
+  closeMobileSidebar();
+}
+
+function switchModalTab(btn, pane) {
+  btn.closest('.modal').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  btn.closest('.modal').querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  btn.closest('.modal').querySelector('#' + pane).classList.add('active');
+}
+
+function openMobileSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function statusBadge(s) {
+  const map = {
+    'Confirmed':'badge-green','confirmed':'badge-green',
+    'Pending':'badge-amber','pending':'badge-amber',
+    'Cancelled':'badge-red','cancelled':'badge-red',
+    'Completed':'badge-blue','completed':'badge-blue',
+    'Active':'badge-green','Inactive':'badge-gray',
+    'Pending Review':'badge-amber','Paid':'badge-green','Draft':'badge-gray'
+  };
+  return `<span class="badge ${map[s] || 'badge-gray'}">${s}</span>`;
+}
+function fmt(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
+
+// ═══════════════════════════════════════════
+// RENDER — BOOKINGS
+// ═══════════════════════════════════════════
+function renderBookingRow(b) {
+  const safeB   = JSON.stringify(b).replace(/'/g, '&#39;');
+  const addons  = b.addons && b.addons.length ? b.addons.join(', ') : '—';
+  const amount  = b.amount || b.totalAmount || 0;
+  return `<tr>
+    <td><span class="text-xs font-black text-[--brand-navy]">${b.bookingRef || b._id?.slice(-6).toUpperCase() || '—'}</span></td>
+    <td>
+      <div class="font-semibold text-gray-800 text-xs">${b.guestName || '—'}</div>
+      <div class="text-[11px] text-gray-400">${b.guestPhone || ''}</div>
+    </td>
+    <td class="text-xs font-medium text-gray-700">${b.propertyName || '—'}</td>
+    <td class="text-xs text-gray-600">${b.checkIn || '—'}</td>
+    <td class="text-xs text-gray-600">${b.checkOut || '—'}</td>
+    <td class="text-xs font-black text-[--brand-navy]">${b.nights || '—'}</td>
+    <td class="text-xs font-black text-green-700">${fmt(amount)}</td>
+    <td class="text-xs text-gray-500">${addons}</td>
+    <td>${statusBadge(b.status || 'Pending')}</td>
+    <td class="flex gap-1.5">
+      <button class="btn btn-outline btn-sm text-xs" onclick='openBookingModal(${safeB})'>View</button>
+      <button class="btn btn-danger btn-sm text-xs" onclick='deleteBooking("${b._id || ''}")' ${!b._id ? 'disabled' : ''}>✕</button>
+    </td>
+  </tr>`;
+}
+
+function renderBookings() {
+  const rows     = BOOKINGS.map(renderBookingRow).join('');
+  const emptyMsg = '<tr><td colspan="10" class="text-center text-gray-400 py-8 text-xs">No bookings yet.</td></tr>';
+  const recentEl = document.getElementById('recentBookingsBody');
+  const allEl    = document.getElementById('allBookingsBody');
+  if (recentEl) recentEl.innerHTML = rows || emptyMsg;
+  if (allEl)    allEl.innerHTML    = rows || emptyMsg;
+}
+
+function filterBookings() {
+  const f        = document.getElementById('bookingStatusFilter').value;
+  const filtered = f ? BOOKINGS.filter(b => b.status === f || b.status?.toLowerCase() === f.toLowerCase()) : BOOKINGS;
+  document.getElementById('allBookingsBody').innerHTML = filtered.map(renderBookingRow).join('') ||
+    '<tr><td colspan="10" class="text-center text-gray-400 py-8 text-xs">No bookings match this filter.</td></tr>';
+}
+
+// ─── Booking detail helpers ────────────────────────────────────────────────
+function addonIcon(name) {
+  const n = (name || '').toLowerCase();
+  if (n.includes('chef'))                          return 'fa-utensils';
+  if (n.includes('bbq') || n.includes('barbecue')) return 'fa-fire-burner';
+  if (n.includes('cake'))                          return 'fa-cake-candles';
+  if (n.includes('decor'))                         return 'fa-gifts';
+  if (n.includes('photo'))                         return 'fa-camera';
+  if (n.includes('spa') || n.includes('massage'))  return 'fa-spa';
+  if (n.includes('cab') || n.includes('transport') || n.includes('pickup')) return 'fa-car';
+  if (n.includes('bonfire'))                       return 'fa-fire';
+  return 'fa-circle-check';
+}
+
+// Find the property linked to a booking (handles populated objects, ids, or name fallback)
+function findPropertyForBooking(b) {
+  const bId = b.property?._id ?? b.property ?? b.propertyId;
+  if (bId) {
+    const byId = PROPERTIES.find(p => getPropId(p) === String(bId));
+    if (byId) return byId;
+  }
+  return PROPERTIES.find(p => p.name === b.propertyName) || null;
+}
+
+// Split a check-in/check-out range into weekday vs weekend (Sat/Sun) night counts
+function nightsBreakdown(checkIn, checkOut) {
+  const start = new Date(toDateOnly(checkIn));
+  const end   = new Date(toDateOnly(checkOut));
+  let weekdayNights = 0, weekendNights = 0;
+  if (isNaN(start) || isNaN(end) || end <= start) return { weekdayNights, weekendNights, totalNights: 0 };
+  for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+    const day = d.getDay(); // 0 = Sun, 6 = Sat
+    if (day === 0 || day === 6) weekendNights++; else weekdayNights++;
+  }
+  return { weekdayNights, weekendNights, totalNights: weekdayNights + weekendNights };
+}
+
+function openBookingModal(b) {
+  const amount = b.amount || b.totalAmount || 0;
+
+  // Add-ons as icon badges (Gourmet Chef, BBQ Setup, etc. stand out clearly)
+  const addonsList = b.addons || [];
+  const addonsHtml = addonsList.length
+    ? addonsList.map(a => `<span class="badge badge-amber"><i class="fa-solid ${addonIcon(a)} text-amber-500"></i> ${a}</span>`).join(' ')
+    : '<span class="text-xs text-gray-400 font-semibold">No add-ons selected</span>';
+
+  // Weekday/weekend pricing breakdown, using the linked property's rates
+  const prop = findPropertyForBooking(b);
+  let pricingHtml = '';
+  if (prop && b.checkIn && b.checkOut) {
+    const weekdayRate = prop.pricePerNight || prop.rate || 0;
+    const wkndRate    = prop.weekendRate || weekdayRate;
+    const { weekdayNights, weekendNights, totalNights } = nightsBreakdown(b.checkIn, b.checkOut);
+    if (totalNights > 0) {
+      const weekdaySubtotal = weekdayNights * weekdayRate;
+      const weekendSubtotal = weekendNights * wkndRate;
+      const roomSubtotal    = weekdaySubtotal + weekendSubtotal;
+      const hasWeekend      = weekendNights > 0;
+      const diffRate        = wkndRate !== weekdayRate;
+      pricingHtml = `
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <label class="form-label">Pricing Breakdown</label>
+          <div class="mt-2 space-y-1.5 text-xs">
+            ${weekdayNights > 0 ? `
+            <div class="flex justify-between">
+              <span class="text-gray-600">Weekday nights (${weekdayNights} × ${fmt(weekdayRate)})</span>
+              <span class="font-bold text-gray-700">${fmt(weekdaySubtotal)}</span>
+            </div>` : ''}
+            ${hasWeekend ? `
+            <div class="flex justify-between">
+              <span class="text-gray-600">Weekend nights (${weekendNights} × ${fmt(wkndRate)})${diffRate ? ' <span class="text-amber-600 font-bold">· weekend rate</span>' : ''}</span>
+              <span class="font-bold text-gray-700">${fmt(weekendSubtotal)}</span>
+            </div>` : ''}
+            <div class="flex justify-between pt-1.5 border-t border-gray-100">
+              <span class="text-gray-700 font-bold">Room subtotal (${totalNights} night${totalNights>1?'s':''})</span>
+              <span class="font-black text-[--brand-navy]">${fmt(roomSubtotal)}</span>
+            </div>
+            ${addonsList.length ? `<div class="text-[11px] text-gray-400">+ add-ons (${addonsList.join(', ')}) and any taxes/fees</div>` : ''}
+          </div>
+          ${hasWeekend && diffRate ? `<div class="mt-2 text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-1.5"><i class="fa-solid fa-circle-info mr-1"></i>This stay includes ${weekendNights} weekend night${weekendNights>1?'s':''} billed at the weekend rate (${fmt(wkndRate)}/night) instead of the weekday rate (${fmt(weekdayRate)}/night).</div>` : ''}
+        </div>`;
+    }
+  }
+
+  document.getElementById('bookingModalBody').innerHTML = `
+    <div class="grid grid-cols-2 gap-4 text-sm">
+      <div class="col-span-2 bg-[--brand-cream] rounded-xl p-4 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-[--brand-navy] flex items-center justify-center text-white font-black text-lg serif">
+          ${(b.guestName || '?').split(' ').map(w=>w[0]).join('').slice(0,2)}
+        </div>
+        <div>
+          <div class="font-black text-[--brand-navy]">${b.guestName || '—'}</div>
+          <div class="text-xs text-gray-500">${b.guestEmail || ''} · ${b.guestPhone || ''}</div>
+        </div>
+        <div class="ml-auto">${statusBadge(b.status || 'Pending')}</div>
+      </div>
+      <div><span class="form-label">Booking Ref</span><div class="font-black text-[--brand-navy]">${b.bookingRef || b._id || '—'}</div></div>
+      <div><span class="form-label">Property</span><div class="font-semibold">${b.propertyName || '—'}</div></div>
+      <div><span class="form-label">Check-in</span><div class="font-semibold">${b.checkIn || '—'}</div></div>
+      <div><span class="form-label">Check-out</span><div class="font-semibold">${b.checkOut || '—'}</div></div>
+      <div><span class="form-label">Nights</span><div class="font-semibold">${b.nights || '—'}</div></div>
+      <div class="col-span-2"><span class="form-label">Add-ons</span><div class="mt-1 flex flex-wrap gap-1.5">${addonsHtml}</div></div>
+      <div><span class="form-label">Total Amount</span><div class="font-black text-green-600 text-lg">${fmt(amount)}</div></div>
+      <div><span class="form-label">Payment</span><div>${b.paid ? '<span class="badge badge-green">Paid</span>' : '<span class="badge badge-red">Unpaid</span>'}</div></div>
+    </div>
+    ${pricingHtml}
+    ${b._id ? `
+    <div class="mt-4 pt-4 border-t border-gray-100">
+      <label class="form-label">Update Status</label>
+      <div class="flex gap-2 flex-wrap mt-2">
+        ${['Pending','Confirmed','Completed','Cancelled'].map(s =>
+          `<button class="btn btn-outline btn-sm text-xs ${b.status===s||b.status?.toLowerCase()===s.toLowerCase()?'bg-gray-100':''}" onclick='updateBookingStatus("${b._id}","${s}")'>${s}</button>`
+        ).join('')}
+      </div>
+    </div>` : ''}
+  `;
+  openModal('bookingModal');
+}
+
+// FIX: was using PUT but bookingRoutes had PATCH /status — now both exist
+async function updateBookingStatus(id, status) {
+  try {
+    const updated = await apiFetch(`/bookings/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status })
+    });
+    const idx = BOOKINGS.findIndex(b => b._id === id);
+    if (idx !== -1) BOOKINGS[idx] = { ...BOOKINGS[idx], ...updated, status };
+    renderBookings();
+    closeModal('bookingModal');
+    showToast(`✅ Booking status updated to "${status}"`);
+  } catch (e) {
+    showToast('⚠️ Failed to update booking: ' + e.message);
+  }
+}
+
+async function deleteBooking(id) {
+  if (!id) return;
+  if (!confirm('Delete this booking? This cannot be undone.')) return;
+  try {
+    await apiFetch(`/bookings/${id}`, { method: 'DELETE' });
+    BOOKINGS = BOOKINGS.filter(b => b._id !== id);
+    renderBookings();
+    updateDashboardStats();
+    showToast('🗑️ Booking deleted');
+  } catch (e) {
+    showToast('⚠️ Failed to delete booking: ' + e.message);
+  }
+}
+
+// ═══════════════════════════════════════════
+// RENDER — PROPERTIES
+// ═══════════════════════════════════════════
+function buildPropertyCard(p) {
+  const rate   = p.pricePerNight || p.rate || 0;
+  const beds   = p.bedrooms || p.beds || 0;
+  const imgSrc = p.image || p.img || '';
+  const type   = p.type || 'Villa';
+  const status = p.status || 'Active';
+  // Safe JSON for onclick — escape single quotes
+  const safeP  = JSON.stringify({...p}).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+  return `
+    <div class="card overflow-hidden group">
+      <div class="relative overflow-hidden aspect-[4/3]">
+        <img src="${imgSrc}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+             onerror="this.src='https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80'">
+        <div class="absolute top-3 left-3 flex gap-1.5 flex-wrap">
+          <span class="badge badge-blue text-[10px]">${type}</span>
+          ${statusBadge(status)}
+        </div>
+        <div class="absolute top-3 right-3">
+          <span class="badge bg-white/90 text-amber-600 text-[11px] font-black">
+            <i class="fa-solid fa-star text-amber-500 text-[9px]"></i> ${p.rating || 4.8}
+          </span>
+        </div>
+        ${(p.reviews||[]).length ? `<div class="absolute bottom-3 left-3 bg-white/90 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-md shadow"><i class="fa-solid fa-star text-amber-400 mr-0.5"></i>${p.reviews.length} review${p.reviews.length>1?'s':''}</div>` : ''}
+      </div>
+      <div class="p-4">
+        <div class="font-black text-[--brand-navy] text-sm mb-0.5">${p.name}</div>
+        <div class="text-xs text-gray-400 font-medium flex items-center gap-1 mb-3">
+          <i class="fa-solid fa-location-dot text-amber-400"></i> ${p.location}
+        </div>
+        <div class="flex gap-3 text-xs text-gray-500 font-semibold mb-3">
+          <span><i class="fa-solid fa-bed text-gray-300 mr-1"></i>${beds} beds</span>
+          <span><i class="fa-solid fa-users text-gray-300 mr-1"></i>${p.guests} guests</span>
+          <span class="text-[--brand-navy] font-black">${fmt(rate)}/night</span>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-outline btn-sm flex-1 text-xs" onclick="openEditPropertyById('${p._id || p.id || ''}')">
+            <i class="fa-regular fa-pen-to-square"></i> Edit
+          </button>
+          <button class="btn btn-danger btn-sm flex-1 text-xs" onclick='deleteProperty("${p._id || p.id || ''}")'>
+            <i class="fa-solid fa-trash"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderProperties() {
+  const grid = document.getElementById('propertyGrid');
+  if (!grid) return;
+  grid.innerHTML = PROPERTIES.length
+    ? PROPERTIES.map(buildPropertyCard).join('')
+    : '<div class="col-span-3 text-center text-gray-400 py-12 font-semibold">No properties yet. Add your first one!</div>';
+
+  const sel = document.getElementById('calPropSelect');
+  if (sel) {
+    const prevSelected = sel.value;
+    sel.innerHTML = '<option value="">Select Property</option>';
+    PROPERTIES.forEach(p => {
+      const o = document.createElement('option');
+      o.value = getPropId(p);
+      o.textContent = p.name;
+      sel.appendChild(o);
+    });
+    // FIX: restore the previously selected property (and keep any in-progress
+    // blocked-date edits) instead of resetting the dropdown to blank every time
+    // renderProperties runs — this was wiping the admin's calendar selection
+    // (and unsaved block/unblock clicks) on every 30s auto-refresh.
+    if (prevSelected && PROPERTIES.some(p => getPropId(p) === prevSelected)) {
+      sel.value = prevSelected;
+    } else {
+      calPendingBlocked = null;
+    }
+  } else {
+    calPendingBlocked = null;
+  }
+}
+
+function filterProperties() {
+  const search = (document.getElementById('propSearch').value || '').toLowerCase();
+  const type   = document.getElementById('propTypeFilter').value;
+  const status = document.getElementById('propStatusFilter').value;
+  const filtered = PROPERTIES.filter(p =>
+    (!search || p.name.toLowerCase().includes(search) || p.location.toLowerCase().includes(search)) &&
+    (!type   || (p.type || 'Villa') === type) &&
+    (!status || (p.status || 'Active') === status)
+  );
+  document.getElementById('propertyGrid').innerHTML = filtered.length
+    ? filtered.map(buildPropertyCard).join('')
+    : '<div class="col-span-3 text-center text-gray-400 py-12 font-semibold">No properties match your filters.</div>';
+}
+
+// ═══════════════════════════════════════════
+// PROPERTY MODAL — ADD / EDIT / DELETE
+// ═══════════════════════════════════════════
+let editingPropertyId = null;
+
+function openAddPropertyModal() {
+  editingPropertyId = null;
+  document.getElementById('propertyModalTitle').textContent = 'Add New Property';
+  ['prop_name','prop_location','prop_beds','prop_guests','prop_desc',
+   'prop_amenities','prop_map','prop_img','prop_weekday','prop_weekend',
+   'prop_deposit','prop_minstay','prop_stayflexi','prop_rating']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const typeEl   = document.getElementById('prop_type');   if (typeEl)   typeEl.value = 'Villa';
+  const statusEl = document.getElementById('prop_status'); if (statusEl) statusEl.value = 'Active';
+  const petsEl   = document.getElementById('prop_pets');   if (petsEl)   petsEl.value = 'No';
+  const hotEl    = document.getElementById('prop_hot');    if (hotEl)    hotEl.checked = false;
+
+  // Clear gallery inputs
+  document.querySelectorAll('.gallery-url').forEach(el => el.value = '');
+  const galleryInputs = document.getElementById('galleryInputs');
+  if (galleryInputs) {
+    const rows = galleryInputs.querySelectorAll('.flex.gap-2');
+    rows.forEach((row, i) => { if (i >= 3) row.remove(); });
+  }
+
+  // Hide cover preview
+  const wrap = document.getElementById('coverPreviewWrap');
+  if (wrap) wrap.classList.add('hidden');
+
+  // Clear reviews & faqs
+  const rl = document.getElementById('reviewsList'); if (rl) rl.innerHTML = '';
+  const fl = document.getElementById('faqsList');    if (fl) fl.innerHTML = '';
+
+  // Switch to first tab
+  switchToModalTab('tab-basic');
+  openModal('propertyModal');
+}
+
+// FIX: edit via ID lookup instead of passing full object in onclick (avoids JSON escaping issues)
+function openEditPropertyById(id) {
+  const p = PROPERTIES.find(p => (p._id || p.id) === id);
+  if (!p) { showToast('⚠️ Property not found'); return; }
+  openEditProperty(p);
+}
+
+function openEditProperty(p) {
+  editingPropertyId = p._id || p.id || null;
+  document.getElementById('propertyModalTitle').textContent = 'Edit: ' + p.name;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+  set('prop_name',      p.name);
+  set('prop_location',  p.location);
+  set('prop_type',      p.type || 'Villa');
+  set('prop_beds',      p.bedrooms || p.beds);
+  set('prop_guests',    p.guests);
+  set('prop_amenities', Array.isArray(p.amenities) ? p.amenities.join(', ') : (p.amenities || ''));
+  set('prop_status',    p.status || 'Active');
+  set('prop_img',       p.image || p.img || '');
+  set('prop_weekday',   p.pricePerNight || p.weekdayRate || p.rate || p.price || '');
+  set('prop_weekend',   p.weekendRate || p.weekendPrice || p.weekend_rate || p.weekendNightRate || '');
+  set('prop_map',       p.mapUrl || p.map || '');
+  set('prop_rating',    p.rating || 4.8);
+  set('prop_pets',      p.pets || 'No');
+  set('prop_stayflexi', p.stayflexi || '');
+  set('prop_deposit',   p.securityDeposit || p.deposit || '');
+  set('prop_minstay',   p.minStay || p.minNights || p.minstay || '');
+
+  const hotEl = document.getElementById('prop_hot');
+  if (hotEl) hotEl.checked = !!p.hot;
+
+  // Cover preview
+  previewCover(p.image || p.img || '');
+
+  // Gallery
+  const galleryInputs = document.getElementById('galleryInputs');
+  if (galleryInputs) {
+    // Reset to 3 rows
+    const existingRows = galleryInputs.querySelectorAll('.flex.gap-2');
+    existingRows.forEach((r, i) => { if (i >= 3) r.remove(); });
+    const inputs = galleryInputs.querySelectorAll('.gallery-url');
+    (p.gallery || []).forEach((url, idx) => {
+      if (idx < inputs.length) {
+        inputs[idx].value = url;
+      } else {
+        addGalleryRow(url);
+      }
+    });
+    // Clear remaining
+    for (let i = (p.gallery||[]).length; i < inputs.length; i++) inputs[i].value = '';
+  }
+
+  // Reviews
+  const rl = document.getElementById('reviewsList');
+  if (rl) {
+    rl.innerHTML = '';
+    (p.reviews || []).forEach(r => addReviewRow(r));
+  }
+
+  // FAQs
+  const fl = document.getElementById('faqsList');
+  if (fl) {
+    fl.innerHTML = '';
+    (p.faqs || []).forEach(f => addFaqRow(f));
+  }
+
+  switchToModalTab('tab-basic');
+  openModal('propertyModal');
+}
+
+async function saveProperty() {
+  const name     = document.getElementById('prop_name').value.trim();
+  const location = document.getElementById('prop_location').value.trim();
+  const image    = document.getElementById('prop_img').value.trim();
+
+  if (!name) {
+    switchToModalTab('tab-basic');
+    document.getElementById('prop_name').focus();
+    showToast('⚠️ Property name is required');
+    return;
+  }
+  if (!location) {
+    switchToModalTab('tab-basic');
+    document.getElementById('prop_location').focus();
+    showToast('⚠️ Location is required');
+    return;
+  }
+  const weekday = parseInt(document.getElementById('prop_weekday').value) || 0;
+  if (!weekday) {
+    switchToModalTab('tab-pricing');
+    document.getElementById('prop_weekday').focus();
+    showToast('⚠️ Weekday rate is required');
+    return;
+  }
+  // Weekend rate is optional — falls back to weekday rate if left blank
+  const weekend = parseInt(document.getElementById('prop_weekend').value) || weekday;
+  if (!image) {
+    switchToModalTab('tab-media');
+    document.getElementById('prop_img').focus();
+    showToast('⚠️ Cover image is required');
+    return;
+  }
+
+  const galleryUrls = [...document.querySelectorAll('.gallery-url')]
+    .map(i => i.value.trim()).filter(v => v.length > 0);
+
+  // Collect reviews
+  const reviews = [];
+  document.querySelectorAll('.review-row').forEach(row => {
+    const author = row.querySelector('.rev-author').value.trim();
+    const text   = row.querySelector('.rev-text').value.trim();
+    const score  = parseFloat(row.querySelector('.rev-score').value) || 5;
+    const date   = row.querySelector('.rev-date').value.trim();
+    if (author || text) reviews.push({ author, text, score, date });
+  });
+
+  // Collect FAQs
+  const faqs = [];
+  document.querySelectorAll('.faq-row').forEach(row => {
+    const q = row.querySelector('.faq-q').value.trim();
+    const a = row.querySelector('.faq-a').value.trim();
+    if (q || a) faqs.push({ q, a });
+  });
+
+  const payload = {
+    name, location,
+    type:          document.getElementById('prop_type').value,
+    bedrooms:      parseInt(document.getElementById('prop_beds').value) || 1,
+    guests:        parseInt(document.getElementById('prop_guests').value) || 2,
+    pricePerNight: weekday,
+    weekendRate:   weekend,
+    securityDeposit: parseInt(document.getElementById('prop_deposit').value) || 0,
+    minStay:       parseInt(document.getElementById('prop_minstay').value) || 1,
+    amenities:     document.getElementById('prop_amenities').value.split(',').map(s => s.trim()).filter(Boolean),
+    status:        document.getElementById('prop_status').value,
+    image,
+    gallery:       galleryUrls,
+    mapUrl:        document.getElementById('prop_map').value.trim(),
+    rating:        parseFloat(document.getElementById('prop_rating').value) || 4.8,
+    hot:           !!(document.getElementById('prop_hot')?.checked),
+    reviews,
+    faqs,
+  };
+
+  // FIX: warn (and bail) before sending if the payload is huge — gives a clearer
+  // message than a generic "Payload Too Large" from the server, and avoids a
+  // failed round trip.
+  const payloadSizeMB = new Blob([JSON.stringify(payload)]).size / (1024 * 1024);
+  if (payloadSizeMB > 9) {
+    switchToModalTab('tab-media');
+    showToast(`⚠️ Images are too large (~${payloadSizeMB.toFixed(1)} MB total). Try fewer/smaller images.`);
+    return;
+  }
+
+  try {
+    let result;
+    if (editingPropertyId) {
+      result = await apiFetch(`/properties/${editingPropertyId}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+      const idx = PROPERTIES.findIndex(p => (p._id || p.id) === editingPropertyId);
+      if (idx !== -1) PROPERTIES[idx] = result;
+      showToast(`✅ "${name}" updated`);
+    } else {
+      result = await apiFetch('/properties', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      PROPERTIES.push(result);
+      showToast(`✅ "${name}" added`);
+    }
+    renderProperties();
+    updateDashboardStats();
+    closeModal('propertyModal');
+  } catch (e) {
+    showToast('⚠️ Save failed: ' + e.message);
+  }
+}
+
+async function deleteProperty(id) {
+  if (!id) { showToast('⚠️ Cannot delete: no property ID'); return; }
+  if (!confirm('Delete this property permanently? This cannot be undone.')) return;
+  try {
+    await apiFetch(`/properties/${id}`, { method: 'DELETE' });
+    PROPERTIES = PROPERTIES.filter(p => (p._id || p.id) !== id);
+    renderProperties();
+    updateDashboardStats();
+    showToast('🗑️ Property deleted');
+  } catch (e) {
+    showToast('⚠️ Delete failed: ' + e.message);
+  }
+}
+
+// ─── Reviews row helpers ──────────────────────────────────────────────────────
+function addReviewRow(data = {}) {
+  const list = document.getElementById('reviewsList');
+  if (!list) return;
+  const div = document.createElement('div');
+  div.className = 'review-row bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-2';
+  div.innerHTML = `
+    <div class="flex gap-2">
+      <input class="form-input rev-author flex-1" placeholder="Guest name" value="${data.author || ''}">
+      <input class="form-input rev-score w-20 shrink-0" type="number" min="1" max="5" step="0.1" placeholder="4.8" value="${data.score || ''}">
+      <input class="form-input rev-date w-28 shrink-0" placeholder="Month Year" value="${data.date || ''}">
+      <button type="button" onclick="this.closest('.review-row').remove()" class="text-red-400 hover:text-red-600 text-base px-1">✕</button>
+    </div>
+    <textarea class="form-input rev-text w-full" rows="2" placeholder="Review text...">${data.text || ''}</textarea>
+  `;
+  list.appendChild(div);
+}
+
+// ─── FAQ row helpers ──────────────────────────────────────────────────────────
+function addFaqRow(data = {}) {
+  const list = document.getElementById('faqsList');
+  if (!list) return;
+  const div = document.createElement('div');
+  div.className = 'faq-row bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-2';
+  div.innerHTML = `
+    <div class="flex gap-2 items-start">
+      <input class="form-input faq-q flex-1" placeholder="Question" value="${data.q || ''}">
+      <button type="button" onclick="this.closest('.faq-row').remove()" class="text-red-400 hover:text-red-600 text-base px-1 mt-1">✕</button>
+    </div>
+    <textarea class="form-input faq-a w-full" rows="2" placeholder="Answer...">${data.a || ''}</textarea>
+  `;
+  list.appendChild(div);
+}
+
+// ─── Media tab helpers ────────────────────────────────────────────────────────
+function previewCover(url) {
+  const wrap = document.getElementById('coverPreviewWrap');
+  const img  = document.getElementById('coverPreview');
+  if (!wrap || !img) return;
+  if (url && url.length > 0) {
+    img.src = url;
+    wrap.classList.remove('hidden');
+  } else {
+    wrap.classList.add('hidden');
+  }
+}
+
+function handleUrlInput(el) {
+  const val = el.value.trim();
+  if (val.startsWith('data:') || val.startsWith('blob:')) {
+    // base64 is fine — it came from our upload handler
+    if (el.id === 'prop_img') previewCover(val);
+    return;
+  }
+  if (el.id === 'prop_img') previewCover(val);
+}
+
+function handleUrlPaste(event, el) {
+  setTimeout(() => { if (el.id === 'prop_img') previewCover(el.value.trim()); }, 10);
+}
+
+// FIX: resize + re-encode an uploaded image as JPEG before turning it into base64,
+// so a multi-MB photo from a phone doesn't blow past the server's body-size limit.
+function compressImage(file, maxDim = 1600, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round(height * (maxDim / width));
+            width = maxDim;
+          } else {
+            width = Math.round(width * (maxDim / height));
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        // White background first — JPEG has no alpha channel, so transparent
+        // PNGs would otherwise turn black.
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => reject(new Error('Could not read image'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('Could not read file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// FIX: Upload cover image from device → resize/compress → base64
+async function handleCoverUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 15 * 1024 * 1024) { showToast('⚠️ Image too large (max 15 MB)'); event.target.value = ''; return; }
+  try {
+    const dataUrl = await compressImage(file);
+    document.getElementById('prop_img').value = dataUrl;
+    previewCover(dataUrl);
+    showToast(`✅ Cover image ready (~${Math.round(dataUrl.length / 1024)} KB)`);
+  } catch (e) {
+    showToast('⚠️ Failed to process image: ' + e.message);
+  } finally {
+    event.target.value = '';
+  }
+}
+
+// FIX: Upload gallery image from device → resize/compress → base64
+async function handleGalleryUpload(event, labelEl) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 15 * 1024 * 1024) { showToast('⚠️ Image too large (max 15 MB)'); event.target.value = ''; return; }
+  const input = labelEl.closest('.flex.gap-2').querySelector('.gallery-url');
+  try {
+    const dataUrl = await compressImage(file);
+    input.value = dataUrl;
+    showToast(`✅ Gallery image ready (~${Math.round(dataUrl.length / 1024)} KB)`);
+  } catch (e) {
+    showToast('⚠️ Failed to process image: ' + e.message);
+  } finally {
+    event.target.value = '';
+  }
+}
+
+function addGalleryRow(prefillUrl = '') {
+  const container = document.getElementById('galleryInputs');
+  if (!container) return;
+  const count = container.querySelectorAll('.gallery-url').length;
+  if (count >= 10) { showToast('Maximum 10 gallery images allowed'); return; }
+  const div = document.createElement('div');
+  div.className = 'flex gap-2';
+  div.innerHTML = `
+    <input class="form-input gallery-url flex-1" placeholder="Gallery image ${count + 1} — paste https:// URL or upload" oninput="handleUrlInput(this)" onpaste="handleUrlPaste(event,this)" value="${prefillUrl}">
+    <label class="btn btn-outline btn-sm shrink-0 cursor-pointer" title="Upload from device">
+      <i class="fa-solid fa-upload"></i>
+      <input type="file" accept="image/*" class="hidden" onchange="handleGalleryUpload(event,this)">
+    </label>
+    <button type="button" onclick="this.closest('.flex').remove()" class="btn btn-danger btn-sm shrink-0">✕</button>
+  `;
+  container.appendChild(div);
+}
+
+function switchToModalTab(paneId) {
+  const modal = document.getElementById('propertyModal');
+  if (!modal) return;
+  modal.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  modal.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  const pane = document.getElementById(paneId);
+  if (pane) pane.classList.add('active');
+  const labels = {
+    'tab-basic':'Basic Info', 'tab-pricing':'Pricing',
+    'tab-media':'Media',      'tab-reviews':'Reviews', 'tab-faqs':'FAQs'
+  };
+  modal.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.textContent.trim() === labels[paneId]) b.classList.add('active');
+  });
+}
+
+// ═══════════════════════════════════════════
+// PROMO
+// ═══════════════════════════════════════════
+function openPromoModal() { openModal('promoModal'); }
+function savePromo() {
+  const code = document.getElementById('promo_code').value.trim().toUpperCase();
+  if (!code) { showToast('⚠️ Promo code is required'); return; }
+  closeModal('promoModal');
+  showToast(`✅ Promo code "${code}" created`);
+}
+
+// ═══════════════════════════════════════════
+// STATIC RENDERS
+// ═══════════════════════════════════════════
+// ── Calendar state ──
+let calYear  = new Date().getFullYear();
+let calMonth = new Date().getMonth(); // 0-indexed
+let calPendingBlocked = null; // null = not editing yet
+
+function onCalPropChange() {
+  // FIX: discard any unsaved block/unblock edits from the previously
+  // selected property when switching to a different one.
+  calPendingBlocked = null;
+  renderCalendar();
+}
+
+function calChangeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+// FIX: helper to get a property's ID regardless of whether the API returns _id or id
+function getPropId(p) {
+  return String(p._id ?? p.id ?? '');
+}
+
+// FIX: normalize any date value (Date, ISO string with time, or plain "YYYY-MM-DD")
+// down to a plain "YYYY-MM-DD" string so saved/blocked/booked dates always compare equal.
+function toDateOnly(d) {
+  if (!d) return '';
+  if (d instanceof Date) return d.toISOString().slice(0, 10);
+  return String(d).slice(0, 10);
+}
+
+function renderCalendar() {
+  const grid    = document.getElementById('calendarGrid');
+  const propId  = document.getElementById('calPropSelect').value;
+  const label   = document.getElementById('calMonthLabel');
+  if (!grid) return;
+
+  const monthNames = ['January','February','March','April','May','June',
+                      'July','August','September','October','November','December'];
+  if (label) label.textContent = monthNames[calMonth] + ' ' + calYear;
+
+  if (!propId) {
+    grid.innerHTML = '<div class="col-span-7 text-center text-gray-400 text-xs font-semibold py-10">Select a property to view calendar</div>';
+    document.getElementById('calSaveBtn')?.classList.add('hidden');
+    return;
+  }
+
+  // FIX: match against _id OR id, since backend may return either
+  const prop = PROPERTIES.find(p => getPropId(p) === propId);
+  if (!prop) {
+    grid.innerHTML = '<div class="col-span-7 text-center text-gray-400 text-xs font-semibold py-10">Property not found</div>';
+    return;
+  }
+
+  // Use pending blocked if we're mid-edit, otherwise use saved.
+  // FIX: normalize every date to "YYYY-MM-DD" so dates saved with a time
+  // component (e.g. "2026-06-15T00:00:00.000Z") still match the calendar grid.
+  const blocked = (calPendingBlocked !== null ? calPendingBlocked : (prop.blockedDates || [])).map(toDateOnly);
+  calPendingBlocked = blocked;
+
+  // Collect booked date ranges for this property
+  const bookedRanges = BOOKINGS.filter(b => {
+    const bId = b.property?._id ?? b.property ?? b.propertyId;
+    return String(bId) === propId && !['cancelled','Cancelled'].includes(b.status);
+  });
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html = days.map(d =>
+    `<div class="text-center text-[10px] font-black text-gray-400 uppercase py-1">${d}</div>`
+  ).join('');
+
+  // Blank cells before first day
+  for (let i = 0; i < firstDay; i++) html += '<div></div>';
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = calYear + '-' + String(calMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const thisDate = new Date(calYear, calMonth, d);
+    const isPast = thisDate < today;
+
+    // Check if booked — FIX: normalize checkIn/checkOut before comparing
+    let isBooked = false, isCheckinout = false;
+    bookedRanges.forEach(b => {
+      const ci = toDateOnly(b.checkIn), co = toDateOnly(b.checkOut);
+      if (!ci || !co) return;
+      if (dateStr === ci || dateStr === co) { isCheckinout = true; isBooked = true; }
+      else if (dateStr > ci && dateStr < co) isBooked = true;
+    });
+
+    const isBlocked = blocked.includes(dateStr);
+
+    let bg, title, clickable = '';
+    if (isPast)       { bg = 'bg-gray-100 text-gray-300 cursor-default opacity-60'; title = 'Past date'; }
+    else if (isBooked){ bg = isCheckinout ? 'bg-teal-400 text-white cursor-default' : 'bg-amber-400 text-white cursor-default'; title = isCheckinout ? 'Check-in/out' : 'Booked'; }
+    else if (isBlocked){ bg = 'bg-red-300 text-red-900 hover:bg-red-400 cursor-pointer'; title = 'Blocked — click to unblock'; clickable = `onclick="calToggleBlock('${dateStr}')"` }
+    else              { bg = 'bg-gray-100 text-gray-700 hover:bg-red-100 hover:text-red-700 cursor-pointer'; title = 'Available — click to block'; clickable = `onclick="calToggleBlock('${dateStr}')"` }
+
+    html += `<div ${clickable} title="${title}" class="aspect-square flex items-center justify-center rounded-lg text-xs font-bold transition ${bg}">${d}</div>`;
+  }
+
+  grid.innerHTML = html;
+  document.getElementById('calSaveBtn')?.classList.remove('hidden');
+}
+
+function calToggleBlock(dateStr) {
+  if (!calPendingBlocked) calPendingBlocked = [];
+  const idx = calPendingBlocked.indexOf(dateStr);
+  if (idx === -1) calPendingBlocked.push(dateStr);
+  else calPendingBlocked.splice(idx, 1);
+  renderCalendar();
+}
+
+async function saveBlockedDates() {
+  const propId = document.getElementById('calPropSelect').value;
+  if (!propId) { showToast('⚠️ Select a property first'); return; }
+  // FIX: ensure we always send clean "YYYY-MM-DD" strings, deduplicated
+  const blockedDates = [...new Set((calPendingBlocked || []).map(toDateOnly))].sort();
+  try {
+    await apiFetch(`/properties/${propId}/blocked-dates`, {
+      method: 'PATCH',
+      body: JSON.stringify({ blockedDates })
+    });
+    // Update local PROPERTIES cache
+    const prop = PROPERTIES.find(p => getPropId(p) === propId);
+    if (prop) prop.blockedDates = blockedDates;
+    calPendingBlocked = blockedDates;
+    showToast('✅ Availability saved');
+  } catch(e) {
+    showToast('⚠️ Failed to save: ' + e.message);
+  }
+}
+
+function renderGuests() {
+  const guestMap = {};
+  BOOKINGS.forEach(b => {
+    const key = b.guestEmail || b.guestPhone;
+    if (!key) return;
+    if (!guestMap[key]) {
+      guestMap[key] = { name: b.guestName || '—', phone: b.guestPhone || '', email: b.guestEmail || '', stays: 0, spent: 0 };
+    }
+    guestMap[key].stays++;
+    if (['Confirmed','Completed','confirmed','completed'].includes(b.status))
+      guestMap[key].spent += (b.amount || b.totalAmount || 0);
+  });
+  const guests = Object.values(guestMap);
+
+  const gcEl = document.getElementById('guestCount');
+  if (gcEl) gcEl.textContent = guests.length + (guests.length === 1 ? ' guest' : ' guests');
+
+  document.getElementById('guestsBody').innerHTML = guests.length
+    ? guests.map(g => `
+      <tr>
+        <td>
+          <div class="flex items-center gap-2">
+            <div class="avatar text-xs shrink-0">${g.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+            <div class="font-semibold text-sm text-gray-800">${g.name}</div>
+          </div>
+        </td>
+        <td><div class="text-xs text-gray-600">${g.phone}</div><div class="text-[11px] text-gray-400">${g.email}</div></td>
+        <td class="text-xs font-black text-[--brand-navy]">${g.stays}</td>
+        <td class="text-xs font-black text-green-600">${fmt(g.spent)}</td>
+        <td colspan="2" class="text-xs text-gray-400">—</td>
+        <td></td>
+      </tr>`).join('')
+    : '<tr><td colspan="7" class="text-center text-gray-400 py-12 text-xs font-semibold">No guest data yet.</td></tr>';
+}
+
+// FIX: renderReviews now reads actual reviews from PROPERTIES
+function renderReviews() {
+  const allReviews = [];
+  PROPERTIES.forEach(p => {
+    (p.reviews || []).forEach(r => {
+      allReviews.push({ ...r, propertyName: p.name, propertyId: p._id });
+    });
+  });
+
+  const filterVal = document.getElementById('reviewFilter')?.value || '';
+  const filtered  = filterVal === 'below3'
+    ? allReviews.filter(r => r.score < 3)
+    : filterVal
+      ? allReviews.filter(r => Math.floor(r.score) === parseInt(filterVal))
+      : allReviews;
+
+  const elAvg   = document.getElementById('reviewAvgRating');
+  const elCount = document.getElementById('reviewCount');
+  if (elAvg) elAvg.textContent   = allReviews.length ? (allReviews.reduce((s,r) => s+r.score,0) / allReviews.length).toFixed(1) : '—';
+  if (elCount) elCount.textContent = allReviews.length;
+
+  document.getElementById('reviewsContainer').innerHTML = filtered.length
+    ? filtered.map(r => `
+      <div class="card p-4 flex gap-4 items-start">
+        <div class="w-10 h-10 rounded-full bg-[--brand-navy] text-white flex items-center justify-center font-black text-sm shrink-0">
+          ${(r.author||'?').split(' ').map(w=>w[0]).join('').slice(0,2)}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start gap-2 flex-wrap">
+            <div>
+              <div class="font-bold text-gray-900 text-sm">${r.author || '—'}</div>
+              <div class="text-xs text-gray-400 font-medium">${r.date || ''} · ${r.propertyName}</div>
+            </div>
+            <span class="badge badge-amber shrink-0"><i class="fa-solid fa-star text-amber-400 mr-0.5"></i>${r.score}</span>
+          </div>
+          <p class="text-xs text-gray-600 mt-2 leading-relaxed">"${r.text || '—'}"</p>
+        </div>
+      </div>`).join('')
+    : '<div class="text-center text-gray-400 py-12 font-semibold text-sm">No reviews found. Add reviews via the property editor.</div>';
+}
+
+function renderPayouts() {
+  document.getElementById('payoutsBody').innerHTML =
+    '<tr><td colspan="8" class="text-center text-gray-400 py-12 text-xs font-semibold">No payout data yet.</td></tr>';
+}
+
+function renderPromos() {
+  document.getElementById('promoBody').innerHTML =
+    '<tr><td colspan="7" class="text-center text-gray-400 py-12 text-xs font-semibold">No promo codes yet. Create your first above.</td></tr>';
+}
+
+// ═══════════════════════════════════════════
+// AUTO-REFRESH
+// ═══════════════════════════════════════════
+const POLL_INTERVAL = 30000;
+let lastBookingCount   = 0;
+let lastPropertyCount  = 0;
+
+async function silentRefresh() {
+  try {
+    const [freshProperties, freshBookings] = await Promise.all([
+      apiFetch('/properties'),
+      apiFetch('/bookings'),
+    ]);
+    const newBookings   = freshBookings.length   > lastBookingCount;
+    const newProperties = freshProperties.length > lastPropertyCount;
+
+    PROPERTIES = freshProperties;
+    BOOKINGS   = freshBookings;
+
+    renderProperties();
+    renderBookings();
+    updateDashboardStats();
+
+    const active = document.querySelector('.tab-pane.active');
+    if (active) {
+      const id = active.id.replace('section-', '');
+      if (id === 'guests')  renderGuests();
+      if (id === 'reviews') renderReviews();
+      if (id === 'payouts') renderPayouts();
+      if (id === 'promo')   renderPromos();
+    }
+
+    if (newBookings) {
+      const diff = freshBookings.length - lastBookingCount;
+      showToast(`🔔 ${diff} new booking${diff > 1 ? 's' : ''} received`);
+      addNotification('📅', 'New Booking', `${diff} new booking${diff > 1 ? 's' : ''} received`);
+    }
+    if (newProperties) {
+      const diff = freshProperties.length - lastPropertyCount;
+      showToast(`🏠 ${diff} new propert${diff > 1 ? 'ies' : 'y'} added`);
+      addNotification('🏠', 'New Property', `${diff} new propert${diff > 1 ? 'ies' : 'y'} added`);
+    }
+
+    lastBookingCount  = freshBookings.length;
+    lastPropertyCount = freshProperties.length;
+    updateRefreshIndicator(true);
+  } catch (e) {
+    updateRefreshIndicator(false);
+    console.warn('Auto-refresh failed:', e.message);
+  }
+}
+
+function updateRefreshIndicator(online) {
+  const dot = document.getElementById('refreshDot');
+  const lbl = document.getElementById('refreshLabel');
+  if (!dot || !lbl) return;
+  if (online) {
+    dot.className   = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
+    lbl.textContent = 'Live · ' + new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+  } else {
+    dot.className   = 'w-2 h-2 rounded-full bg-red-400 inline-block';
+    lbl.textContent = 'Offline';
+  }
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  await Promise.all([loadProperties(), loadBookings()]);
+  lastBookingCount  = BOOKINGS.length;
+  lastPropertyCount = PROPERTIES.length;
+  updateRefreshIndicator(true);
+  setInterval(silentRefresh, POLL_INTERVAL);
+});
+</script>
+</body>
+</html>

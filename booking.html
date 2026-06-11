@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StellarStays | Property Details & Booking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --brand-navy: #0f1f3d;
+            --brand-amber: #f59e0b;
+            --brand-cream: #fdf8f0;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: #f8f7f4; }
+        h1, h2, h3, .display { font-family: 'Playfair Display', serif; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Swiper */
+        .swiper-button-next, .swiper-button-prev {
+            color: #0f1f3d !important;
+            background: rgba(255,255,255,0.92);
+            width: 40px !important; height: 40px !important;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .swiper-button-next:after, .swiper-button-prev:after { font-size: 14px !important; font-weight: 900; }
+        .swiper-pagination-bullet-active { background: #f59e0b !important; }
+
+        /* FAQ */
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(0,1,0,1); }
+        .faq-item.active .faq-answer { max-height: 1000px; transition: max-height 0.5s ease-in-out; }
+        .faq-item.active .faq-icon { transform: rotate(180deg); }
+
+        /* Sticky sidebar */
+        .sticky-sidebar { position: sticky; top: 80px; }
+
+        /* Input focus */
+        .form-input:focus { outline: none; border-color: var(--brand-amber); box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
+
+        /* Verified badge */
+        .verified-badge { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+
+        /* Availability status dot */
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+        .status-dot { animation: blink 2s ease-in-out infinite; }
+
+        /* Stayflexi iframe wrapper */
+        .stayflexi-frame {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 24px rgba(15,31,61,0.08);
+        }
+
+        /* Guest counter */
+        .guest-counter-btn:hover { background: #f3f4f6; }
+        .guest-counter-btn:active { background: #e5e7eb; }
+
+        /* Availability pill */
+        .avail-available { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .avail-limited   { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .avail-unavailable { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .avail-loading   { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- ===================== NAV ===================== -->
+    <nav class="bg-white border-b border-gray-100 px-4 md:px-8 py-3.5 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+        <a href="index.html" class="font-black tracking-wider text-[--brand-navy] flex items-center gap-2 text-lg" style="font-family:'Playfair Display',serif;">
+            <i class="fa-solid fa-arrow-left text-sm text-amber-500"></i> STELLAR<span class="text-amber-500">STAYS</span>
+        </a>
+        <div class="flex items-center gap-3">
+            <span class="verified-badge text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <i class="fa-solid fa-shield-halved text-emerald-600"></i> Verified Luxury Partner
+            </span>
+            <a href="https://wa.me/919876543210" target="_blank" class="bg-emerald-500 text-white w-9 h-9 rounded-full flex items-center justify-center text-base hover:bg-emerald-600 transition shadow-sm">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ===================== MAIN ===================== -->
+    <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 flex-grow w-full">
+
+        <!-- Property Title -->
+        <div class="mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-3">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                        <i class="fa-solid fa-bolt"></i> Direct Booking
+                    </span>
+                    <span class="text-xs font-bold text-teal-700 bg-teal-50 border border-teal-200 px-2.5 py-1 rounded-full">
+                        Zero Commission
+                    </span>
+                    <!-- Live Availability Pill -->
+                    <span id="availabilityPill" class="avail-loading text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
+                        <span class="status-dot w-2 h-2 rounded-full bg-gray-400 inline-block"></span>
+                        <span id="availabilityText">Checking availability…</span>
+                    </span>
+                </div>
+                <h1 id="detailVillaName" class="text-2xl md:text-3xl font-black text-[--brand-navy] tracking-tight">Loading...</h1>
+                <p class="text-sm text-gray-500 mt-1.5 flex items-center flex-wrap gap-x-3 gap-y-1">
+                    <span><i class="fa-solid fa-location-dot text-amber-500 mr-1"></i><span id="detailVillaLocation">—</span>, India</span>
+                    <span class="text-gray-200 hidden sm:inline">|</span>
+                    <span class="font-semibold text-[--brand-navy]">
+                        <i class="fa-solid fa-star text-amber-500 mr-1"></i><span id="detailVillaRating">0.0</span> · Excellent
+                    </span>
+                </p>
+            </div>
+            <div class="flex gap-2 text-sm font-semibold text-gray-600">
+                <button class="flex items-center gap-1.5 bg-white px-3 py-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition text-xs">
+                    <i class="fa-regular fa-share-from-square text-gray-400"></i> Share
+                </button>
+                <button class="flex items-center gap-1.5 bg-white px-3 py-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition text-xs">
+                    <i class="fa-regular fa-heart text-rose-400"></i> Save
+                </button>
+            </div>
+        </div>
+
+        <!-- Image Slider -->
+        <div class="relative rounded-2xl overflow-hidden shadow-md mb-8 bg-gray-900">
+            <div class="swiper mainVillaSlider aspect-[16/9] md:aspect-[21/9]">
+                <div class="swiper-wrapper" id="sliderWrapper"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+            <span class="absolute bottom-4 left-4 z-10 bg-[--brand-navy]/80 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-lg font-medium pointer-events-none">
+                <i class="fa-solid fa-expand mr-1.5 text-amber-400"></i> Click any photo to zoom fullscreen
+            </span>
+        </div>
+
+        <!-- Split Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+            <!-- LEFT COLUMN -->
+            <div class="lg:col-span-7 space-y-8">
+
+                <!-- Quick Info Badges -->
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm grid grid-cols-4 text-center divide-x divide-gray-100">
+                    <div class="px-2">
+                        <span id="detailVillaBeds" class="text-sm font-bold block text-gray-900">—</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Property</span>
+                    </div>
+                    <div class="px-2">
+                        <span id="detailVillaGuests" class="text-sm font-bold block text-gray-900">—</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Max Guests</span>
+                    </div>
+                    <div class="px-2">
+                        <span id="detailVillaAdults" class="text-sm font-bold block text-gray-900">1 Adult</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Selected</span>
+                    </div>
+                    <div class="px-2">
+                        <span id="detailVillaPets" class="text-sm font-bold block text-gray-900">—</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Pets</span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="space-y-3">
+                    <h2 class="text-xl font-black text-[--brand-navy]">About this boutique getaway</h2>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        Experience unmatched comfort and design tailored for discerning travellers. Our properties combine local architectural character with premium luxury installations. Fully staffed and ready to create memorable experiences for your group.
+                    </p>
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        <span class="text-xs bg-green-50 border border-green-200 text-green-700 font-semibold px-3 py-1 rounded-full flex items-center gap-1.5">
+                            <i class="fa-solid fa-check"></i> Instant Confirmation
+                        </span>
+                        <span class="text-xs bg-blue-50 border border-blue-200 text-blue-700 font-semibold px-3 py-1 rounded-full flex items-center gap-1.5">
+                            <i class="fa-solid fa-check"></i> Free Cancellation (7+ days)
+                        </span>
+                        <span class="text-xs bg-amber-50 border border-amber-200 text-amber-700 font-semibold px-3 py-1 rounded-full flex items-center gap-1.5">
+                            <i class="fa-solid fa-check"></i> 24/7 Host Support
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Amenities -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-black text-[--brand-navy]">Spaces & Amenities</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="amenityContainer"></div>
+                </div>
+
+                <!-- ===================== STAYFLEXI REAL-TIME AVAILABILITY ===================== -->
+                <div class="space-y-4" id="stayflexiSection">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-black text-[--brand-navy]">Real-Time Availability</h2>
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
+                            <span class="status-dot w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                            Powered by Stayflexi
+                        </div>
+                    </div>
+
+                    <!-- Availability Status Banner -->
+                    <div id="availBanner" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 animate-pulse">
+                            <i class="fa-solid fa-calendar-check text-gray-300 text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-black text-gray-400">Select dates to check live availability</div>
+                            <div class="text-xs text-gray-400 mt-0.5">Pick your check-in and check-out dates below to see real-time rates and availability via Stayflexi.</div>
+                        </div>
+                    </div>
+
+                    <!-- Stayflexi iFrame Embed -->
+                    <!-- 
+                        ══════════════════════════════════════════════════════
+                        HOW TO CONNECT STAYFLEXI:
+                        1. Log in to your Stayflexi dashboard → Settings → Booking Engine
+                        2. Copy your Hotel ID (e.g. "SF_HOTEL_12345")
+                        3. Replace YOUR_STAYFLEXI_HOTEL_ID below with your actual ID
+                        4. The iframe will show live availability, rates & booking directly
+                        ══════════════════════════════════════════════════════
+                    -->
+                    <div class="stayflexi-frame bg-white" id="stayflexiWrapper">
+                        <iframe
+                            id="stayflexiIframe"
+                            src="https://book.stayflexi.com/36295"
+                            width="100%"
+                            height="650"
+                            frameborder="0"
+                            scrolling="yes"
+                            allow="payment"
+                            title="Real-Time Availability & Booking — Forest Divine 3BHK · Powered by Stayflexi">
+                        </iframe>
+                    </div>
+
+                    <p class="text-[11px] text-gray-400 font-medium flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-info text-amber-400"></i>
+                        Availability updates in real-time. Rates shown include all applicable taxes.
+                    </p>
+                </div>
+
+                <!-- Date Picker -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-black text-[--brand-navy]">Select Your Stay Dates</h2>
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Check-in → Check-out</label>
+                        <input type="text" id="dateRangePicker" placeholder="Select check-in and check-out dates"
+                            class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-[--brand-navy] transition cursor-pointer bg-[--brand-cream]">
+                        <p class="text-[11px] text-gray-400 mt-2 font-medium">
+                            <i class="fa-solid fa-circle-info mr-1 text-amber-400"></i>
+                            Minimum stay may apply. Select a range to see your total.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Google Map -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-black text-[--brand-navy]">Location</h2>
+                    <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm aspect-video bg-gray-100">
+                        <iframe id="googleMapsEmbed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                    <p class="text-xs text-gray-400 font-medium flex items-center gap-1.5">
+                        <i class="fa-solid fa-lock text-gray-300"></i> Exact address shared after booking confirmation
+                    </p>
+                </div>
+
+                <!-- Reviews -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-black text-[--brand-navy]">Guest Reviews</h2>
+                        <span class="text-xs text-gray-500 font-semibold bg-white border border-gray-200 px-3 py-1.5 rounded-xl shadow-sm">
+                            <i class="fa-solid fa-star text-amber-500 mr-1"></i><span id="detailVillaRating2">0.0</span> · Verified
+                        </span>
+                    </div>
+                    <div class="space-y-4" id="reviewsContainer"></div>
+                </div>
+
+                <!-- FAQ -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-black text-[--brand-navy]">Frequently Asked Questions</h2>
+                    <div class="space-y-2.5" id="faqContainer"></div>
+                </div>
+
+            </div>
+
+            <!-- ===================== RIGHT SIDEBAR — BOOKING WIDGET ===================== -->
+            <div class="lg:col-span-5">
+                <div class="sticky-sidebar bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
+
+                    <!-- Header -->
+                    <div class="bg-[--brand-navy] p-5 text-white">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-2xl font-black" style="font-family:'Playfair Display',serif;">
+                                    <span id="stickyRatePrint">₹0</span>
+                                    <span class="text-sm font-normal text-gray-300"> / night</span>
+                                </div>
+                                <div class="text-xs text-amber-300 font-semibold mt-1 flex items-center gap-1">
+                                    <i class="fa-solid fa-bolt"></i> Direct Booking · Zero Commission
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-gray-400 font-medium">Rating</div>
+                                <div class="text-sm font-bold text-amber-400 flex items-center gap-1 justify-end">
+                                    <i class="fa-solid fa-star text-xs"></i><span id="stickyRating">0.0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Mini availability badge in sidebar header -->
+                        <div class="mt-3 pt-3 border-t border-white/10 flex items-center gap-2">
+                            <span id="sidebarAvailBadge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/10 text-gray-300 flex items-center gap-1.5">
+                                <span class="status-dot w-1.5 h-1.5 rounded-full bg-gray-400 inline-block"></span>
+                                Select dates to check availability
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-5 space-y-5">
+
+                        <!-- Guest Info Form -->
+                        <div class="space-y-3">
+                            <h3 class="text-sm font-black text-[--brand-navy] uppercase tracking-wider">Lead Guest Information</h3>
+                            <div class="space-y-2.5">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Full Name *</label>
+                                    <input type="text" id="guestName" placeholder="e.g. Rahul Sharma"
+                                        class="form-input w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-[--brand-navy] transition bg-gray-50">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Email Address *</label>
+                                    <input type="email" id="guestEmail" placeholder="rahul@example.com"
+                                        class="form-input w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-[--brand-navy] transition bg-gray-50">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">WhatsApp Number *</label>
+                                    <div class="flex">
+                                        <span class="bg-gray-100 border border-r-0 border-gray-200 rounded-l-xl px-3 flex items-center text-sm font-semibold text-gray-500">+91</span>
+                                        <input type="tel" id="guestPhone" placeholder="98765 43210"
+                                            class="form-input flex-1 border border-gray-200 rounded-r-xl px-3.5 py-2.5 text-sm font-semibold text-[--brand-navy] transition bg-gray-50">
+                                    </div>
+                                </div>
+
+                                <!-- ====== GUEST COUNT SECTION ====== -->
+                                <div class="bg-[--brand-cream] rounded-xl border border-amber-100 p-4 space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Number of Guests</h4>
+                                        <span id="guestCountSummary" class="text-xs font-bold text-[--brand-navy] bg-white px-2.5 py-1 rounded-lg border border-gray-200 shadow-sm">2 Adults</span>
+                                    </div>
+
+                                    <!-- Adults -->
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="text-sm font-bold text-[--brand-navy]">Adults</div>
+                                            <div class="text-[10px] text-gray-400">Age 13+</div>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <button type="button" onclick="changeGuests('adults', -1)" class="guest-counter-btn w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 font-bold text-lg transition">−</button>
+                                            <span id="adultsCount" class="w-5 text-center text-sm font-black text-[--brand-navy]">2</span>
+                                            <button type="button" onclick="changeGuests('adults', 1)" class="guest-counter-btn w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 font-bold text-lg transition">+</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Children -->
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="text-sm font-bold text-[--brand-navy]">Children</div>
+                                            <div class="text-[10px] text-gray-400">Age 2–12</div>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <button type="button" onclick="changeGuests('children', -1)" class="guest-counter-btn w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 font-bold text-lg transition">−</button>
+                                            <span id="childrenCount" class="w-5 text-center text-sm font-black text-[--brand-navy]">0</span>
+                                            <button type="button" onclick="changeGuests('children', 1)" class="guest-counter-btn w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 font-bold text-lg transition">+</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Infants -->
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="text-sm font-bold text-[--brand-navy]">Infants</div>
+                                            <div class="text-[10px] text-gray-400">Under 2</div>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <button type="button" onclick="changeGuests('infants', -1)" class="guest-counter-btn w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 font-bold text-lg transition">−</button>
+                                            <span id="infantsCount" class="w-5 text-center text-sm font-black text-[--brand-navy]">0</span>
+                                            <button type="button" onclick="changeGuests('infants', 1)" class="guest-counter-btn w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 font-bold text-lg transition">+</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Max guests warning -->
+                                    <div id="maxGuestWarning" class="hidden text-[11px] text-red-600 font-semibold flex items-center gap-1.5 pt-1 border-t border-amber-100">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                        <span id="maxGuestWarningText">Exceeds max capacity for this villa.</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-100">
+
+                        <!-- Add-ons -->
+                        <div class="space-y-2.5">
+                            <h3 class="text-sm font-black text-[--brand-navy] uppercase tracking-wider">Enhance Your Stay</h3>
+                            <label class="flex items-center justify-between p-3.5 rounded-xl bg-amber-50 border border-amber-100 text-xs font-bold text-gray-700 cursor-pointer hover:border-amber-300 transition">
+                                <span class="flex items-center gap-2">
+                                    <input type="checkbox" id="addonChef" onchange="calculateTotal()" class="accent-amber-500 w-4 h-4">
+                                    <span>🍳 Private Gourmet Chef</span>
+                                </span>
+                                <span class="text-amber-700 font-black">+₹4,500/day</span>
+                            </label>
+                            <label class="flex items-center justify-between p-3.5 rounded-xl bg-orange-50 border border-orange-100 text-xs font-bold text-gray-700 cursor-pointer hover:border-orange-300 transition">
+                                <span class="flex items-center gap-2">
+                                    <input type="checkbox" id="addonBonfire" onchange="calculateTotal()" class="accent-orange-500 w-4 h-4">
+                                    <span>🔥 Sunset Bonfire Kit</span>
+                                </span>
+                                <span class="text-orange-700 font-black">+₹1,500/night</span>
+                            </label>
+                        </div>
+
+                        <hr class="border-gray-100">
+
+                        <!-- Price Breakdown -->
+                        <div class="space-y-2.5 text-xs font-medium text-gray-600 bg-[--brand-cream] p-4 rounded-xl border border-amber-100">
+                            <div class="flex justify-between">
+                                <span id="baseLabel" class="text-gray-500">Base Accommodation Fee</span>
+                                <span id="baseCost" class="font-bold text-gray-900">₹0</span>
+                            </div>
+                            <div class="flex justify-between hidden" id="addonChefRow">
+                                <span class="text-gray-500">Private Chef</span>
+                                <span id="addonChefCost" class="font-bold text-gray-900">₹0</span>
+                            </div>
+                            <div class="flex justify-between hidden" id="addonBonfireRow">
+                                <span class="text-gray-500">Bonfire Setup</span>
+                                <span id="addonBonfireCost" class="font-bold text-gray-900">₹0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">GST & Levies (18%)</span>
+                                <span id="taxCost" class="font-bold text-gray-900">₹0</span>
+                            </div>
+                            <div class="flex justify-between text-sm font-extrabold text-[--brand-navy] pt-3 border-t border-dashed border-amber-200">
+                                <span>Total Payable</span>
+                                <span id="grandTotal" class="text-base text-emerald-600">₹0</span>
+                            </div>
+                        </div>
+
+                        <!-- CTA -->
+                        <button onclick="executePaymentGateway()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-extrabold py-4 rounded-xl shadow-md transition tracking-wide flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-lock text-xs"></i> Confirm & Pay Securely
+                        </button>
+
+                        <!-- Trust line -->
+                        <p class="text-center text-[10px] text-gray-400 font-medium flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                            Secure payment · Free cancellation 7+ days prior
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="bg-[#0f1f3d] text-gray-400 mt-16 pt-12 pb-8 px-4 md:px-8 relative">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 pb-10 border-b border-white/10">
+            <div class="md:col-span-4 space-y-4">
+                <div class="text-2xl font-black tracking-wider text-white" style="font-family:'Playfair Display',serif;">
+                    STELLAR<span class="text-amber-400">STAYS</span>
+                </div>
+                <p class="text-xs text-gray-500 font-medium leading-relaxed max-w-xs">
+                    Turn your property into profits with StellarStays. Exceptional property management and premium vacation rentals across India.
+                </p>
+                <div class="flex gap-3 text-lg text-gray-500">
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-square-facebook"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="md:col-span-5 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs font-semibold text-gray-500">
+                <div class="space-y-3">
+                    <h5 class="text-gray-200 font-bold text-sm tracking-wide">Explore</h5>
+                    <ul class="space-y-2.5">
+                        <li><a href="about-us.html" class="hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Travel Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition">Hosting Templates</a></li>
+                        <li><a href="#" class="hover:text-white transition">Terms of Use</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-3">
+                    <h5 class="text-gray-200 font-bold text-sm tracking-wide">Support</h5>
+                    <ul class="space-y-2.5">
+                        <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Host Knowledge Hub</a></li>
+                        <li><a href="#" class="hover:text-white transition">Ground Rules for Hosts</a></li>
+                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-3">
+                    <h5 class="text-gray-200 font-bold text-sm tracking-wide">Legal</h5>
+                    <ul class="space-y-2.5">
+                        <li><a href="#" class="hover:text-white transition">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition">State Regulation</a></li>
+                        <li><a href="#" class="hover:text-white transition">Cancellation & Refund</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="md:col-span-3 space-y-4">
+                <h5 class="text-gray-200 font-bold text-sm tracking-wide">Need Help?</h5>
+                <p class="text-xs text-gray-500 leading-relaxed">Our team is available 9am–9pm daily via WhatsApp.</p>
+                <a href="https://wa.me/919876543210" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-600 transition shadow-md">
+                    <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp Us
+                </a>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-[11px] text-gray-600">
+            <span>Copyright © 2025 StellarStays. All rights reserved.</span>
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-heart text-rose-400"></i> Made with love for India's best stays</span>
+        </div>
+        <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-50 bg-emerald-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-2xl hover:bg-emerald-600 hover:scale-110 transition duration-300 group">
+            <i class="fa-brands fa-whatsapp"></i>
+            <span class="absolute right-16 bg-white text-gray-800 text-xs font-bold px-3 py-1.5 rounded-xl border border-gray-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">Chat with Us</span>
+        </a>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+
+    <script>
+    // ── Guest counter state ──
+    const guests = { adults: 2, children: 0, infants: 0 };
+    const MAX_GUESTS = 20; // will be overridden by villa data
+
+    function changeGuests(type, delta) {
+        const min = type === 'adults' ? 1 : 0;
+        guests[type] = Math.max(min, guests[type] + delta);
+        // enforce total max (adults + children)
+        const total = guests.adults + guests.children;
+        if (total > MAX_GUESTS) {
+            guests[type] -= delta; // revert
+            document.getElementById('maxGuestWarning').classList.remove('hidden');
+            document.getElementById('maxGuestWarningText').textContent =
+                `Max ${MAX_GUESTS} guests allowed for this villa.`;
+            return;
+        }
+        document.getElementById('maxGuestWarning').classList.add('hidden');
+        document.getElementById('adultsCount').textContent   = guests.adults;
+        document.getElementById('childrenCount').textContent = guests.children;
+        document.getElementById('infantsCount').textContent  = guests.infants;
+        // update summary pill
+        let parts = [`${guests.adults} Adult${guests.adults !== 1 ? 's' : ''}`];
+        if (guests.children) parts.push(`${guests.children} Child${guests.children !== 1 ? 'ren' : ''}`);
+        if (guests.infants)  parts.push(`${guests.infants} Infant${guests.infants !== 1 ? 's' : ''}`);
+        document.getElementById('guestCountSummary').textContent = parts.join(', ');
+        // sync the quick-info badge
+        document.getElementById('detailVillaAdults').textContent =
+            `${guests.adults} Adult${guests.adults !== 1 ? 's' : ''}`;
+        // recalc price
+        calculateTotal();
+        // update Stayflexi iframe URL with guest count if live
+        updateStayflexiUrl();
+    }
+
+    // ── Stayflexi availability check ──
+    // When dates are selected, update the iframe src with dates + guests
+    // and update the availability banner.
+    let checkIn = '', checkOut = '';
+
+    function updateStayflexiUrl() {
+        const iframe = document.getElementById('stayflexiIframe');
+        if (!iframe) return; // placeholder mode
+        const hotelId = '36295'; // Forest Divine 3BHK
+        let url = `https://book.stayflexi.com/${hotelId}`;
+        if (checkIn && checkOut) {
+            url += `?checkin=${checkIn}&checkout=${checkOut}&adults=${guests.adults}&children=${guests.children}`;
+        }
+        iframe.src = url;
+        updateAvailabilityBanner();
+    }
+
+    function updateAvailabilityBanner() {
+        const pill     = document.getElementById('availabilityPill');
+        const text     = document.getElementById('availabilityText');
+        const dot      = pill.querySelector('.status-dot');
+        const sideBadge = document.getElementById('sidebarAvailBadge');
+        const banner   = document.getElementById('availBanner');
+
+        if (!checkIn || !checkOut) {
+            setAvailUI('loading', 'Checking availability…', 'Select dates to check availability', banner, null);
+            return;
+        }
+
+        // Simulate a status check — in production this would be a real Stayflexi API call
+        // Stayflexi Flex API endpoint: GET /api/v1/hotels/{hotelId}/availability
+        setAvailUI('loading', 'Checking…', 'Checking…', banner, null);
+        setTimeout(() => {
+            // Demo: show Available. Replace this block with a real fetch() to Stayflexi API.
+            setAvailUI('available',
+                '✓ Available for selected dates',
+                '✓ Available',
+                banner,
+                { checkIn, checkOut, guests: guests.adults + guests.children }
+            );
+        }, 900);
+    }
+
+    function setAvailUI(status, pillLabel, badgeLabel, banner, data) {
+        const pill      = document.getElementById('availabilityPill');
+        const text      = document.getElementById('availabilityText');
+        const sideBadge = document.getElementById('sidebarAvailBadge');
+
+        pill.className = `text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 avail-${status}`;
+        text.textContent = pillLabel;
+        sideBadge.className = `text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 avail-${status}`;
+        sideBadge.innerHTML = `<span class="status-dot w-1.5 h-1.5 rounded-full inline-block ${
+            status === 'available' ? 'bg-emerald-500' :
+            status === 'limited'   ? 'bg-amber-500' :
+            status === 'unavailable' ? 'bg-red-500' : 'bg-gray-400'
+        }"></span> ${badgeLabel}`;
+
+        if (data) {
+            const nights = Math.round((new Date(data.checkOut) - new Date(data.checkIn)) / 86400000);
+            banner.innerHTML = `
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+                    status === 'available' ? 'bg-emerald-50' : 'bg-red-50'
+                }">
+                    <i class="fa-solid ${
+                        status === 'available' ? 'fa-circle-check text-emerald-500' : 'fa-circle-xmark text-red-500'
+                    } text-2xl"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="text-sm font-black ${status === 'available' ? 'text-emerald-700' : 'text-red-700'}">
+                        ${status === 'available' ? 'Villa is available!' : 'Not available for selected dates'}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-0.5">
+                        ${data.checkIn} → ${data.checkOut} · ${nights} night${nights !== 1 ? 's' : ''} · ${data.guests} guest${data.guests !== 1 ? 's' : ''}
+                    </div>
+                </div>
+                ${status === 'available' ? `<div class="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full shrink-0">Book Now ↓</div>` : ''}
+            `;
+        }
+    }
+
+    // ── Date picker init (fires availability check on date change) ──
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr('#dateRangePicker', {
+            mode: 'range',
+            minDate: 'today',
+            dateFormat: 'Y-m-d',
+            onChange: function (dates) {
+                if (dates.length === 2) {
+                    checkIn  = dates[0].toISOString().split('T')[0];
+                    checkOut = dates[1].toISOString().split('T')[0];
+                    updateStayflexiUrl();
+                    calculateTotal();
+                } else {
+                    checkIn = ''; checkOut = '';
+                    calculateTotal();
+                }
+            }
+        });
+    });
+
+    // ── Utility: get URL param (case-insensitive) ──
+    function getParam(name) {
+        const lower = name.toLowerCase();
+        for (const [k, v] of new URLSearchParams(window.location.search)) {
+            if (k.toLowerCase() === lower) return v;
+        }
+        return '';
+    }
+
+    // ── Property state ──
+    let villaData = null;
+
+    // ── API base ──
+    function getApiBase() {
+        const { hostname, port } = window.location;
+        return (port && port !== '5000') ? `http://${hostname}:5000/api` : '/api';
+    }
+
+    // ── calculateTotal ──
+    function calculateTotal() {
+        const pricePerNight = villaData ? (villaData.pricePerNight || 0) : 0;
+        const nights = (checkIn && checkOut)
+            ? Math.max(0, Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000))
+            : 0;
+
+        const base     = pricePerNight * nights;
+        const chefOn   = document.getElementById('addonChef')?.checked;
+        const fireOn   = document.getElementById('addonBonfire')?.checked;
+        const chef     = chefOn  ? 4500 * nights : 0;
+        const bonfire  = fireOn  ? 1500 * nights : 0;
+        const subtotal = base + chef + bonfire;
+        const tax      = Math.round(subtotal * 0.18);
+        const total    = subtotal + tax;
+
+        const baseLabel = document.getElementById('baseLabel');
+        if (baseLabel) {
+            baseLabel.textContent = nights > 0
+                ? `Base (₹${pricePerNight.toLocaleString('en-IN')} × ${nights} night${nights !== 1 ? 's' : ''})`
+                : 'Base Accommodation Fee';
+        }
+        document.getElementById('baseCost').textContent   = `₹${base.toLocaleString('en-IN')}`;
+        document.getElementById('taxCost').textContent    = `₹${tax.toLocaleString('en-IN')}`;
+        document.getElementById('grandTotal').textContent = `₹${total.toLocaleString('en-IN')}`;
+
+        const chefRow    = document.getElementById('addonChefRow');
+        const bonfireRow = document.getElementById('addonBonfireRow');
+        if (chefRow)    { chefRow.classList.toggle('hidden', !chefOn);  document.getElementById('addonChefCost').textContent    = `₹${chef.toLocaleString('en-IN')}`; }
+        if (bonfireRow) { bonfireRow.classList.toggle('hidden', !fireOn); document.getElementById('addonBonfireCost').textContent = `₹${bonfire.toLocaleString('en-IN')}`; }
+    }
+
+    // ── executePaymentGateway — saves to DB, redirects to confirmation ──
+    async function executePaymentGateway() {
+        const name  = document.getElementById('guestName')?.value.trim();
+        const email = document.getElementById('guestEmail')?.value.trim();
+        const phone = document.getElementById('guestPhone')?.value.trim();
+
+        if (!name || !email || !phone) {
+            alert('Please fill in your name, email, and WhatsApp number before confirming.');
+            return;
+        }
+        if (!checkIn || !checkOut) {
+            alert('Please select your check-in and check-out dates.');
+            return;
+        }
+        if (!villaData) {
+            alert('Property data is still loading. Please wait a moment and try again.');
+            return;
+        }
+
+        const nights        = Math.max(0, Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000));
+        const pricePerNight = villaData.pricePerNight || 0;
+        const chefOn        = document.getElementById('addonChef')?.checked || false;
+        const bonfireOn     = document.getElementById('addonBonfire')?.checked || false;
+        const baseAmount    = pricePerNight * nights;
+        const addonAmount   = (chefOn ? 4500 * nights : 0) + (bonfireOn ? 1500 * nights : 0);
+        const taxAmount     = Math.round((baseAmount + addonAmount) * 0.18);
+        const totalAmount   = baseAmount + addonAmount + taxAmount;
+
+        // Disable button to prevent double-submit
+        const btn = document.querySelector('[onclick="executePaymentGateway()"]');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Saving Booking…'; }
+
+        try {
+            const res = await fetch(`${getApiBase()}/bookings`, {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    property:     villaData._id,
+                    propertyName: villaData.name,
+                    guestName:    name,
+                    guestEmail:   email,
+                    guestPhone:   phone,
+                    checkIn,
+                    checkOut,
+                    nights,
+                    adults:       guests.adults,
+                    children:     guests.children,
+                    infants:      guests.infants,
+                    pricePerNight,
+                    baseAmount,
+                    addonChef:    chefOn,
+                    addonBonfire: bonfireOn,
+                    addonAmount,
+                    taxAmount,
+                    totalAmount,
+                    status: 'pending'
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.message || 'Booking failed');
+
+            window.location.href = `confirmation.html?bookingId=${data.booking._id}`;
+
+        } catch (err) {
+            console.error('Booking error:', err);
+            alert(`Could not save booking: ${err.message}\n\nPlease ensure your server is running.`);
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock text-xs"></i> Confirm & Pay Securely'; }
+        }
+    }
+
+    // ── Load property from API and pre-fill dates/guests from URL ──
+    async function loadBookingPage() {
+        const propertyId  = getParam('id');
+        const urlCheckIn  = getParam('checkIn');
+        const urlCheckOut = getParam('checkOut');
+        const urlAdults   = parseInt(getParam('adults')) || 2;
+
+        // Pre-fill guest count
+        guests.adults = Math.max(1, urlAdults);
+        document.getElementById('adultsCount').textContent = guests.adults;
+        document.getElementById('guestCountSummary').textContent = `${guests.adults} Adult${guests.adults !== 1 ? 's' : ''}`;
+        document.getElementById('detailVillaAdults').textContent = `${guests.adults} Adult${guests.adults !== 1 ? 's' : ''}`;
+
+        // Pre-fill dates
+        if (urlCheckIn && urlCheckOut) {
+            checkIn  = urlCheckIn;
+            checkOut = urlCheckOut;
+            setTimeout(() => {
+                const fp = document.getElementById('dateRangePicker')?._flatpickr;
+                if (fp) fp.setDate([urlCheckIn, urlCheckOut]);
+            }, 150);
+            updateAvailabilityBanner();
+        }
+
+        if (!propertyId) {
+            document.getElementById('detailVillaName').textContent = 'Property not found';
+            return;
+        }
+
+        try {
+            const res = await fetch(`${getApiBase()}/properties/${propertyId}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            villaData = await res.json();
+
+            document.title = `${villaData.name} — StellarStays`;
+            document.getElementById('detailVillaName').textContent     = villaData.name || 'Boutique Stay';
+            document.getElementById('detailVillaLocation').textContent = villaData.location || 'India';
+            document.getElementById('detailVillaRating').textContent   = villaData.rating || '4.8';
+            document.getElementById('detailVillaRating2').textContent  = villaData.rating || '4.8';
+            document.getElementById('detailVillaBeds').textContent     = `${villaData.bedrooms || '—'} BHK`;
+            document.getElementById('detailVillaGuests').textContent   = `${villaData.guests || '—'} Guests`;
+            document.getElementById('detailVillaPets').textContent     = villaData.petsAllowed ? 'Allowed' : 'Not Allowed';
+            document.getElementById('stickyRating').textContent        = villaData.rating || '4.8';
+            document.getElementById('stickyRatePrint').textContent     = `₹${(villaData.pricePerNight || 0).toLocaleString('en-IN')}`;
+
+            // Amenities
+            const amenContainer = document.getElementById('amenityContainer');
+            if (amenContainer && villaData.amenities?.length) {
+                amenContainer.innerHTML = villaData.amenities.map(a =>
+                    `<div class="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 border border-gray-100">
+                        <i class="fa-solid fa-check text-emerald-500 text-xs shrink-0"></i>${a}
+                     </div>`
+                ).join('');
+            }
+
+            // Image slider
+            const wrapper = document.getElementById('sliderWrapper');
+            const images  = villaData.gallery?.length ? villaData.gallery : (villaData.image ? [villaData.image] : []);
+            if (wrapper && images.length) {
+                wrapper.innerHTML = images.map(src =>
+                    `<div class="swiper-slide"><img src="${src}" class="w-full h-full object-cover"
+                         onerror="this.src='https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80'"></div>`
+                ).join('');
+            }
+
+            // Google Maps
+            const mapEl = document.getElementById('googleMapsEmbed');
+            if (mapEl && villaData.location) {
+                mapEl.src = `https://maps.google.com/maps?q=${encodeURIComponent(villaData.location + ', India')}&output=embed`;
+            }
+
+            calculateTotal();
+
+            if (window.Swiper && images.length) {
+                new Swiper('.mainVillaSlider', {
+                    loop: images.length > 1,
+                    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                    pagination: { el: '.swiper-pagination', clickable: true },
+                });
+            }
+
+        } catch (err) {
+            console.error('[StellarStays] Could not load property:', err);
+            document.getElementById('detailVillaName').textContent = 'Could not load property';
+        }
+    }
+
+    window.addEventListener('load', loadBookingPage);
+    </script>
+
+</body>
+</html>
