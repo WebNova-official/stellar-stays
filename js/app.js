@@ -157,19 +157,16 @@ function handleSearch() {
 }
 
 // ==========================================
-// INIT — smart API base detection
-// Supports both:
-//   • Live Server  (127.0.0.1:5500 or localhost:5500) → backend at :5000
-//   • Direct Node  (localhost:5000)                   → backend at :5000
+// API BASE — works for:
+//   • localhost:5500 (Live Server)  → http://localhost:5000/api
+//   • localhost:5000 (Node direct)  → /api
+//   • stellar-stays.onrender.com    → /api
 // ==========================================
 function getApiBase() {
     const { hostname, port } = window.location;
-    // If served via Live Server (port 5500) or any static server ≠ 5000,
-    // point to the Express backend on port 5000
-    if (port !== '5000') {
-        return `http://${hostname}:5000/api`;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return port === '5000' ? '/api' : 'http://localhost:5000/api';
     }
-    // If somehow served by Express itself
     return '/api';
 }
 
@@ -178,7 +175,6 @@ async function loadProperties() {
     const grid     = document.getElementById("propertyGrid");
     const count    = document.getElementById("propertyCount");
 
-    // Show loading state
     grid.innerHTML = `<div class="col-span-full text-center py-16 text-gray-400 font-medium animate-pulse">Assembling your dream spaces…</div>`;
     count.innerText = "Loading…";
 
@@ -186,13 +182,11 @@ async function loadProperties() {
         console.log(`[StellarStays] Fetching properties from: ${API_BASE}/properties`);
 
         const response = await fetch(`${API_BASE}/properties`);
-
         if (!response.ok) throw new Error(`Server returned ${response.status}`);
 
         const all = await response.json();
         console.log(`[StellarStays] Loaded ${all.length} properties from DB`);
 
-        // Only show Active properties on the public page
         propertiesInventory = all.filter(p => !p.status || p.status === "Active");
         console.log(`[StellarStays] Active properties: ${propertiesInventory.length}`);
 
@@ -214,7 +208,6 @@ async function loadProperties() {
             </div>`;
         count.innerText = "0 spaces available";
 
-        // Show pills placeholder so page doesn't look broken
         const pills = document.getElementById("locationPills");
         if (pills) pills.innerHTML = `<span class="text-xs text-gray-300 font-medium">—</span>`;
     }
