@@ -42,10 +42,9 @@ const propertySchema = new mongoose.Schema({
     }
 });
 
-// Auto-backfill weekendRate = pricePerNight if not set
-propertySchema.pre("save", function(next) {
+// Mongoose 7+ async middleware — no next() callback needed
+propertySchema.pre("save", async function() {
     if (!this.weekendRate) this.weekendRate = this.pricePerNight;
-    next();
 });
 
 module.exports = mongoose.model("Property", propertySchema);
