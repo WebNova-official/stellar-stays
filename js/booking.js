@@ -10,9 +10,18 @@ let calendarInstance = null;
 const CHEF_RATE_PER_DAY      = 4500;
 const BONFIRE_RATE_PER_NIGHT = 1500;
 
+// ==========================================
+// API BASE — works for:
+//   • localhost:5500 (Live Server)  → http://localhost:5000/api
+//   • localhost:5000 (Node direct)  → /api
+//   • stellar-stays.onrender.com    → /api
+// ==========================================
 function getApiBase() {
     const { hostname, port } = window.location;
-    return (port && port !== '5000') ? `http://${hostname}:5000/api` : '/api';
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return port === '5000' ? '/api' : 'http://localhost:5000/api';
+    }
+    return '/api';
 }
 
 // ==========================================
@@ -304,7 +313,6 @@ async function executePaymentGateway() {
             body:    JSON.stringify(payload),
         });
 
-        // ── Handle date conflict (409) ──
         if (res.status === 409) {
             const err = await res.json();
             alert("❌ " + err.message);
