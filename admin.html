@@ -906,7 +906,10 @@
 // ═══════════════════════════════════════════
 function getApiBase() {
   const { hostname, port } = window.location;
-  return (port && port !== '5000') ? `http://${hostname}:5000/api` : '/api';
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return port === '5000' ? '/api' : 'http://localhost:5000/api';
+  }
+  return '/api';
 }
 const API = (() => getApiBase())(); // evaluated once at load
 
