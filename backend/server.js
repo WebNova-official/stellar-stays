@@ -14,8 +14,8 @@ app.use(cors());
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
-// ── Serve static frontend files from /public ──
-app.use(express.static(path.join(__dirname, "public")));
+// ── Serve static frontend files from root (one level up from /backend) ──
+app.use(express.static(path.join(__dirname, "..")));
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log("✅  MongoDB Connected"))
@@ -26,7 +26,7 @@ app.use("/api/bookings",   bookingRoutes);
 
 // ── Fallback: serve index.html for any unmatched route ──
 app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(path.join(__dirname, "..", "index.html"));
 });
 
 const PORT = process.env.PORT || 5000;
